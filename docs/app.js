@@ -132,7 +132,7 @@ function viewConsole(main) {
   grid.append(right); main.append(grid);
 }
 function setStep(k) { S.step = Math.max(0, Math.min(scenario().events.length, k)); go('console', { scenario: S.scenario, mode: 'replay', step: S.step }); }
-function logList(entries, now) { return h('div', { class: 'loglist' }, entries.length ? entries.map(l => h('div', {}, h('span', {}, fmtTime(Date.parse(l.at)).slice(-5)), h('span', { class: 'muted' }, l.actor), h('span', { class: l.kind === 'guard-no' ? 'no' : l.kind === 'sim' ? 'sim' : '' }, (l.kind === 'guard-no' ? '⊘ ' : '') + l.text + (l.kind === 'sim' ? ' (Simulated)' : '')))) : h('div', { class: 'muted' }, 'empty')); }
+function logList(entries, now) { return h('div', { class: 'loglist' }, entries.length ? entries.map(l => h('div', {}, h('span', {}, fmtTime(Date.parse(l.at)).slice(-5)), h('span', { class: 'muted' }, l.actor), h('span', { class: l.kind === 'guard-no' ? 'no' : l.kind === 'sim' ? 'sim' : '' }, (l.kind === 'guard-no' ? '⊘ ' : '') + l.text + (l.kind === 'sim' ? ' (Simulated)' : '')))) : h('div', { class: 'muted' }, 'no events yet — they appear as the conversation runs')); }
 function calendar(c, now, cfg, play) {
   const day = 86400000, weekStart = (() => { const d = new Date(now); const dow = (d.getUTCDay() + 6) % 7; return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()) - dow * day; })();
   const days = [...Array(7)].map((_, i) => weekStart + i * day), hours = []; for (let hh = Math.max(0, cfg.openHour - 1); hh < Math.min(24, cfg.closeHour + 1); hh++) hours.push(hh);
@@ -152,6 +152,9 @@ function viewScenarios(main) {
   main.append(h('div', { class: 'page-head' }, h('h1', {}, `Scenarios · ${SC.length}`), h('span', { class: 'muted' }, `all replayed in this tab just now → `, h('b', { class: 'mono', style: pass < SC.length ? 'color:var(--danger)' : 'color:var(--success)' }, `${pass}/${SC.length} match expected`)), h('span', { class: 'spacer' }), h('div', { class: 'filters', style: 'margin:0' }, ['all', 'pass', 'fail'].map(x => h('button', { 'aria-pressed': f === x ? 'true' : 'false', onclick: () => { S.ui.filter = x; render(); } }, x))), h('button', { class: 'btn btn-sm', onclick: () => { runAllChecks(); render(); toast('Re-ran all 22 scenarios'); } }, 'Re-run')));
   const list = h('div', { class: 'scen' });
   for (const [g, names] of GROUPS) { const rows = names.map(n => { const i = SC.findIndex(s => s.name === n); return [i, res[i]]; }).filter(([, r]) => f === 'all' || (f === 'pass') === r.ok); if (!rows.length) continue; list.append(h('h2', {}, `${g} (${rows.length})`)); for (const [i, r] of rows) list.append(h('div', { class: 'row' + (r.ok ? '' : ' fail') }, h('span', { style: r.ok ? 'color:var(--success)' : 'color:var(--danger)' }, r.ok ? '✓' : '✗'), h('span', { class: 'n' }, i + 1), h('span', {}, h('b', {}, SC[i].name.replace(/_/g, ' ')), ' ', h('span', { class: 'what' }, PROVES[SC[i].name] || ''), r.ok ? null : h('div', { style: 'color:var(--danger)' }, r.problems.join('; '))), statusTag(SC[i].expected.status), h('a', { class: 'btn btn-sm', href: `#/console?scenario=${SC[i].name}&mode=replay&step=0`, onclick: () => { S.scenario = SC[i].name; S.step = 0; S.mode = 'replay'; } }, 'Open'))); }
+  if (!list.children.length) main.append(h('div', { class: 'empty' }, h('h2', {}, f === 'fail' ? 'No failing scenarios' : 'No passing scenarios'),
+    h('p', {}, f === 'fail' ? `All ${SC.length} scenarios match their expected outcome in this tab.` : `None of the ${SC.length} scenarios matches its expected outcome in this tab.`),
+    h('button', { class: 'btn btn-sm', onclick: () => { S.ui.filter = 'all'; render(); } }, 'Show all scenarios')));
   main.append(list, h('p', { class: 'muted', style: 'font-size:var(--text-xs);margin-top:12px' }, 'Expected outcomes come from scenarios.json; the "match" check also compares final status, action counts and log length with output/transcripts.json recorded by `node demo.js build`. Groups are an editorial reading of the README failure-handling table.'));
 }
 function viewConfig(main) {
@@ -171,7 +174,13 @@ function viewConfig(main) {
 function viewLog(main) {
   const cur = current(), f = S.ui.logActor || 'all', rows = cur.sim.log.filter(l => f === 'all' || l.actor === f || (f === 'guard' && l.kind === 'guard-no'));
   main.append(h('div', { class: 'page-head' }, h('h1', {}, 'Log'), h('span', { class: 'muted' }, `${S.mode === 'replay' ? 'scenario ' + S.scenario.replace(/_/g, ' ') + ' · step ' + S.step : 'play session'} · ${cur.sim.log.length} events`), h('span', { class: 'spacer' }), h('div', { class: 'filters', style: 'margin:0' }, ['all', 'customer', 'staff', 'timer', 'adapter', 'guard'].map(x => h('button', { 'aria-pressed': f === x ? 'true' : 'false', onclick: () => { S.ui.logActor = x; render(); } }, x))), h('button', { class: 'btn btn-sm', onclick: () => { const a = h('a', { href: URL.createObjectURL(new Blob([JSON.stringify({ mode: S.mode, scenario: S.scenario, events: cur.events, log: cur.sim.log, actions: cur.sim.actions, state: cur.sim.state }, null, 2)], { type: 'application/json' })), download: `desk-log-${S.mode === 'replay' ? S.scenario : 'play'}.json` }); document.body.append(a); a.click(); a.remove(); } }, 'Export JSON')));
-  main.append(h('div', { class: 'card' }, logList(rows, cur.now)));
+  if (rows.length) { main.append(h('div', { class: 'card' }, logList(rows, cur.now))); return; }
+  const filtered = cur.sim.log.length > 0;   // events exist but the actor filter hides them all
+  main.append(h('div', { class: 'empty' }, h('h2', {}, filtered ? `No ${f} events` : 'No events yet'),
+    h('p', {}, filtered ? `The ${f} filter hides all ${cur.sim.log.length} events of this ${S.mode === 'replay' ? 'replay step' : 'play session'}.`
+      : S.mode === 'replay' ? `Step ${S.step} of this scenario has not run anything yet. Step forward in the console to replay it.` : 'Nothing has happened in this play session yet. Place a missed call in the console to start.'),
+    filtered ? h('button', { class: 'btn btn-sm', onclick: () => { S.ui.logActor = 'all'; render(); } }, 'Show all events')
+      : h('a', { class: 'btn btn-sm', href: `#/console?scenario=${S.scenario}&mode=${S.mode}&step=${S.step}` }, 'Open the console')));
 }
 
 /* ---------- render / keys / init ---------- */
