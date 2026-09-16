@@ -339,7 +339,7 @@ dialog table{font-size:var(--text-sm)}dialog td{padding:2px var(--space-3) 2px 0
 .loglist .no{color:var(--danger)}
 .loglist .sim{color:var(--accent-text)}
 .scen{display:grid;gap:var(--space-1)}
-.scen h3{font-size:var(--text-sm);font-weight:var(--weight-medium);margin:var(--space-3) 0 var(--space-1)}
+.scen h2{font-size:var(--text-sm);font-weight:var(--weight-medium);margin:var(--space-3) 0 var(--space-1)}
 .scen .row{display:grid;grid-template-columns:2ch 3ch minmax(0,1fr) auto auto;gap:var(--space-2);align-items:center;padding:var(--space-1) var(--space-2);border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--paper);font-size:var(--text-xs)}
 .scen .row.fail{border-color:var(--danger)}
 .scen .row .n{font-family:var(--font-mono);color:var(--text-3)}
