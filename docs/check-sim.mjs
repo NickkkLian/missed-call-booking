@@ -1,9 +1,9 @@
 // check-sim.mjs — proves the page's replay (docs/sim.js + docs/engine.js, the same files the browser loads) reproduces
 // every scenario: final status, action counts, drafts and log length must equal both scenarios.json's expected block
 // and the transcripts recorded by `node demo.js build`. Also a negative control: a mutated expectation must be caught.
-import fs from 'node:fs'; import path from 'node:path'; import { createRequire } from 'node:module';
+import fs from 'node:fs'; import path from 'node:path'; import { fileURLToPath } from 'node:url'; import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
-const HERE = path.dirname(new URL(import.meta.url).pathname), ROOT = path.resolve(HERE, '..');
+const HERE = path.dirname(fileURLToPath(import.meta.url)), ROOT = path.resolve(HERE, '..');
 const SIM = require(path.join(HERE, 'sim.js'));
 const read = f => JSON.parse(fs.readFileSync(path.join(ROOT, f), 'utf8'));
 const scenarios = read('scenarios.json'), config = read('config.json'), transcripts = read('output/transcripts.json');
