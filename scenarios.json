@@ -1,0 +1,1390 @@
+[
+  {
+    "name": "normal_visit",
+    "events": [
+      {
+        "channel": "customer",
+        "body": {
+          "id": "missed_call-0",
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "type": "missed_call"
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "approve_message-1",
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_message",
+          "messageId": "msg-1",
+          "approved": true
+        }
+      },
+      {
+        "channel": "customer",
+        "body": {
+          "id": "details-2",
+          "at": "2025-09-15T10:02:00.000Z",
+          "phone": "+12025550101",
+          "type": "details",
+          "details": {
+            "name": "Test Customer 01",
+            "issue": "Synthetic leaking fixture",
+            "address": "123 Example Road",
+            "postal": "K1A 0B1",
+            "preference": "visit"
+          }
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "approve_booking-3",
+          "at": "2025-09-15T10:03:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_booking",
+          "approved": true,
+          "revision": 1,
+          "start": "2025-09-16T10:00:00Z",
+          "end": "2025-09-16T11:00:00Z"
+        }
+      },
+      {
+        "channel": "adapter",
+        "body": {
+          "id": "calendar_result-4",
+          "at": "2025-09-15T10:04:00.000Z",
+          "phone": "+12025550101",
+          "type": "calendar_result",
+          "bookingKey": "booking-12025550101-r1",
+          "success": true,
+          "providerEventId": "synthetic-event-01"
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "approve_message-5",
+          "at": "2025-09-15T10:05:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_message",
+          "messageId": "msg-2",
+          "approved": true
+        }
+      }
+    ],
+    "expected": {
+      "status": "booked",
+      "actions": {
+        "sms": 1,
+        "whatsapp": 1,
+        "calendar": 1
+      }
+    }
+  },
+  {
+    "name": "normal_callback",
+    "events": [
+      {
+        "channel": "customer",
+        "body": {
+          "id": "missed_call-0",
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "type": "missed_call"
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "approve_message-1",
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_message",
+          "messageId": "msg-1",
+          "approved": true
+        }
+      },
+      {
+        "channel": "customer",
+        "body": {
+          "id": "details-2",
+          "at": "2025-09-15T10:02:00.000Z",
+          "phone": "+12025550101",
+          "type": "details",
+          "details": {
+            "name": "Test Customer 01",
+            "issue": "Synthetic leaking fixture",
+            "address": "123 Example Road",
+            "postal": "K1A 0B1",
+            "preference": "callback"
+          }
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "approve_booking-3",
+          "at": "2025-09-15T10:03:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_booking",
+          "approved": true,
+          "revision": 1,
+          "start": "2025-09-16T10:00:00Z",
+          "end": "2025-09-16T11:00:00Z"
+        }
+      },
+      {
+        "channel": "adapter",
+        "body": {
+          "id": "calendar_result-4",
+          "at": "2025-09-15T10:04:00.000Z",
+          "phone": "+12025550101",
+          "type": "calendar_result",
+          "bookingKey": "booking-12025550101-r1",
+          "success": true,
+          "providerEventId": "synthetic-event-01"
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "approve_message-5",
+          "at": "2025-09-15T10:05:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_message",
+          "messageId": "msg-2",
+          "approved": true
+        }
+      }
+    ],
+    "expected": {
+      "status": "booked",
+      "actions": {
+        "sms": 1,
+        "whatsapp": 1,
+        "calendar": 1
+      }
+    }
+  },
+  {
+    "name": "duplicate_missed_calls",
+    "events": [
+      {
+        "channel": "customer",
+        "body": {
+          "id": "missed_call-0",
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "type": "missed_call"
+        }
+      },
+      {
+        "channel": "customer",
+        "body": {
+          "id": "missed_call-1",
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "type": "missed_call"
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "approve_message-1",
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_message",
+          "messageId": "msg-1",
+          "approved": true
+        }
+      },
+      {
+        "channel": "customer",
+        "body": {
+          "id": "missed_call-2",
+          "at": "2025-09-15T10:02:00.000Z",
+          "phone": "+12025550101",
+          "type": "missed_call"
+        }
+      }
+    ],
+    "expected": {
+      "status": "waiting_customer",
+      "actions": {
+        "sms": 1,
+        "whatsapp": 0,
+        "calendar": 0
+      },
+      "drafts": 1
+    }
+  },
+  {
+    "name": "open_conversation_after_duplicate_window",
+    "events": [
+      {
+        "channel": "customer",
+        "body": {
+          "id": "missed_call-0",
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "type": "missed_call"
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "approve_message-1",
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_message",
+          "messageId": "msg-1",
+          "approved": true
+        }
+      },
+      {
+        "channel": "customer",
+        "body": {
+          "id": "missed_call-6",
+          "at": "2025-09-15T10:06:00.000Z",
+          "phone": "+12025550101",
+          "type": "missed_call"
+        }
+      }
+    ],
+    "expected": {
+      "status": "waiting_customer",
+      "actions": {
+        "sms": 1,
+        "whatsapp": 0,
+        "calendar": 0
+      },
+      "drafts": 1,
+      "contains": "Existing conversation retained"
+    }
+  },
+  {
+    "name": "plain_text_requires_structured_intake",
+    "events": [
+      {
+        "channel": "customer",
+        "body": {
+          "id": "missed_call-0",
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "type": "missed_call"
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "approve_message-1",
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_message",
+          "messageId": "msg-1",
+          "approved": true
+        }
+      },
+      {
+        "channel": "customer",
+        "body": {
+          "id": "message-2",
+          "at": "2025-09-15T10:02:00.000Z",
+          "phone": "+12025550101",
+          "type": "message",
+          "text": "Please book a visit tomorrow for the leaking fixture at 123 Example Road."
+        }
+      }
+    ],
+    "expected": {
+      "status": "waiting_customer",
+      "actions": {
+        "sms": 1,
+        "whatsapp": 0,
+        "calendar": 0
+      },
+      "drafts": 1,
+      "revision": 0,
+      "contains": "no free-text inference."
+    }
+  },
+  {
+    "name": "no_response_one_reminder",
+    "events": [
+      {
+        "channel": "customer",
+        "body": {
+          "id": "missed_call-0",
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "type": "missed_call"
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "approve_message-1",
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_message",
+          "messageId": "msg-1",
+          "approved": true
+        }
+      },
+      {
+        "channel": "timer",
+        "body": {
+          "id": "tick-32",
+          "at": "2025-09-15T10:32:00.000Z",
+          "phone": "+12025550101",
+          "type": "tick"
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "approve_message-33",
+          "at": "2025-09-15T10:33:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_message",
+          "messageId": "msg-2",
+          "approved": true
+        }
+      },
+      {
+        "channel": "timer",
+        "body": {
+          "id": "tick-60",
+          "at": "2025-09-15T11:00:00.000Z",
+          "phone": "+12025550101",
+          "type": "tick"
+        }
+      },
+      {
+        "channel": "timer",
+        "body": {
+          "id": "tick-100",
+          "at": "2025-09-15T11:40:00.000Z",
+          "phone": "+12025550101",
+          "type": "tick"
+        }
+      },
+      {
+        "channel": "timer",
+        "body": {
+          "id": "tick-200",
+          "at": "2025-09-15T13:20:00.000Z",
+          "phone": "+12025550101",
+          "type": "tick"
+        }
+      }
+    ],
+    "expected": {
+      "status": "closed_no_reply",
+      "actions": {
+        "sms": 1,
+        "whatsapp": 1,
+        "calendar": 0
+      },
+      "drafts": 2
+    }
+  },
+  {
+    "name": "stop_before_send",
+    "events": [
+      {
+        "channel": "customer",
+        "body": {
+          "id": "missed_call-0",
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "type": "missed_call"
+        }
+      },
+      {
+        "channel": "customer",
+        "body": {
+          "id": "message-1",
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "type": "message",
+          "text": " STOP "
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "approve_message-1",
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_message",
+          "messageId": "msg-1",
+          "approved": true
+        }
+      },
+      {
+        "channel": "customer",
+        "body": {
+          "id": "missed_call-20",
+          "at": "2025-09-15T10:20:00.000Z",
+          "phone": "+12025550101",
+          "type": "missed_call"
+        }
+      },
+      {
+        "channel": "timer",
+        "body": {
+          "id": "tick-100",
+          "at": "2025-09-15T11:40:00.000Z",
+          "phone": "+12025550101",
+          "type": "tick"
+        }
+      }
+    ],
+    "expected": {
+      "status": "opted_out",
+      "actions": {
+        "sms": 0,
+        "whatsapp": 0,
+        "calendar": 0
+      }
+    }
+  },
+  {
+    "name": "stop_cancels_reminder",
+    "events": [
+      {
+        "channel": "customer",
+        "body": {
+          "id": "missed_call-0",
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "type": "missed_call"
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "approve_message-1",
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_message",
+          "messageId": "msg-1",
+          "approved": true
+        }
+      },
+      {
+        "channel": "timer",
+        "body": {
+          "id": "tick-32",
+          "at": "2025-09-15T10:32:00.000Z",
+          "phone": "+12025550101",
+          "type": "tick"
+        }
+      },
+      {
+        "channel": "customer",
+        "body": {
+          "id": "message-33",
+          "at": "2025-09-15T10:33:00.000Z",
+          "phone": "+12025550101",
+          "type": "message",
+          "text": " STOP "
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "approve_message-34",
+          "at": "2025-09-15T10:34:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_message",
+          "messageId": "msg-2",
+          "approved": true
+        }
+      }
+    ],
+    "expected": {
+      "status": "opted_out",
+      "actions": {
+        "sms": 1,
+        "whatsapp": 0,
+        "calendar": 0
+      }
+    }
+  },
+  {
+    "name": "outside_business_hours",
+    "events": [
+      {
+        "channel": "customer",
+        "body": {
+          "id": "missed_call-0",
+          "at": "2025-09-15T02:00:00Z",
+          "phone": "+12025550101",
+          "type": "missed_call"
+        }
+      }
+    ],
+    "expected": {
+      "status": "waiting_customer",
+      "actions": {
+        "sms": 0,
+        "whatsapp": 0,
+        "calendar": 0
+      },
+      "contains": "outside business hours"
+    }
+  },
+  {
+    "name": "staff_escalation",
+    "events": [
+      {
+        "channel": "customer",
+        "body": {
+          "id": "missed_call-0",
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "type": "missed_call"
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "approve_message-1",
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_message",
+          "messageId": "msg-1",
+          "approved": true
+        }
+      },
+      {
+        "channel": "customer",
+        "body": {
+          "id": "details-2",
+          "at": "2025-09-15T10:02:00.000Z",
+          "phone": "+12025550101",
+          "type": "details",
+          "details": {
+            "name": "Test Customer 01",
+            "issue": "Synthetic leaking fixture",
+            "address": "123 Example Road",
+            "postal": "K1A 0B1",
+            "preference": "visit"
+          }
+        }
+      },
+      {
+        "channel": "timer",
+        "body": {
+          "id": "tick-48",
+          "at": "2025-09-15T10:48:00.000Z",
+          "phone": "+12025550101",
+          "type": "tick"
+        }
+      },
+      {
+        "channel": "timer",
+        "body": {
+          "id": "tick-90",
+          "at": "2025-09-15T11:30:00.000Z",
+          "phone": "+12025550101",
+          "type": "tick"
+        }
+      }
+    ],
+    "expected": {
+      "status": "awaiting_staff",
+      "actions": {
+        "sms": 1,
+        "whatsapp": 0,
+        "calendar": 0
+      },
+      "escalated": true,
+      "escalations": 1
+    }
+  },
+  {
+    "name": "invalid_postal",
+    "events": [
+      {
+        "channel": "customer",
+        "body": {
+          "id": "missed_call-0",
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "type": "missed_call"
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "approve_message-1",
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_message",
+          "messageId": "msg-1",
+          "approved": true
+        }
+      },
+      {
+        "channel": "customer",
+        "body": {
+          "id": "details-2",
+          "at": "2025-09-15T10:02:00.000Z",
+          "phone": "+12025550101",
+          "type": "details",
+          "details": {
+            "name": "Test Customer 01",
+            "issue": "Synthetic leaking fixture",
+            "address": "123 Example Road",
+            "postal": "000",
+            "preference": "visit"
+          }
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "approve_booking-3",
+          "at": "2025-09-15T10:03:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_booking",
+          "approved": true,
+          "revision": 1,
+          "start": "2025-09-16T10:00:00Z",
+          "end": "2025-09-16T11:00:00Z"
+        }
+      }
+    ],
+    "expected": {
+      "status": "needs_details",
+      "actions": {
+        "sms": 1,
+        "whatsapp": 0,
+        "calendar": 0
+      },
+      "contains": "invalid postal"
+    }
+  },
+  {
+    "name": "invalid_address",
+    "events": [
+      {
+        "channel": "customer",
+        "body": {
+          "id": "missed_call-0",
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "type": "missed_call"
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "approve_message-1",
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_message",
+          "messageId": "msg-1",
+          "approved": true
+        }
+      },
+      {
+        "channel": "customer",
+        "body": {
+          "id": "details-2",
+          "at": "2025-09-15T10:02:00.000Z",
+          "phone": "+12025550101",
+          "type": "details",
+          "details": {
+            "name": "Test Customer 01",
+            "issue": "Synthetic leaking fixture",
+            "address": "",
+            "postal": "K1A 0B1",
+            "preference": "visit"
+          }
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "approve_booking-3",
+          "at": "2025-09-15T10:03:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_booking",
+          "approved": true,
+          "revision": 1,
+          "start": "2025-09-16T10:00:00Z",
+          "end": "2025-09-16T11:00:00Z"
+        }
+      }
+    ],
+    "expected": {
+      "status": "needs_details",
+      "actions": {
+        "sms": 1,
+        "whatsapp": 0,
+        "calendar": 0
+      },
+      "contains": "invalid address"
+    }
+  },
+  {
+    "name": "outside_service_area",
+    "events": [
+      {
+        "channel": "customer",
+        "body": {
+          "id": "missed_call-0",
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "type": "missed_call"
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "approve_message-1",
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_message",
+          "messageId": "msg-1",
+          "approved": true
+        }
+      },
+      {
+        "channel": "customer",
+        "body": {
+          "id": "details-2",
+          "at": "2025-09-15T10:02:00.000Z",
+          "phone": "+12025550101",
+          "type": "details",
+          "details": {
+            "name": "Test Customer 01",
+            "issue": "Synthetic leaking fixture",
+            "address": "123 Example Road",
+            "postal": "H0H 0H0",
+            "preference": "visit"
+          }
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "approve_booking-3",
+          "at": "2025-09-15T10:03:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_booking",
+          "approved": true,
+          "revision": 1,
+          "start": "2025-09-16T10:00:00Z",
+          "end": "2025-09-16T11:00:00Z"
+        }
+      }
+    ],
+    "expected": {
+      "status": "needs_details",
+      "actions": {
+        "sms": 1,
+        "whatsapp": 0,
+        "calendar": 0
+      },
+      "contains": "outside service area"
+    }
+  },
+  {
+    "name": "stale_approval_after_edit",
+    "events": [
+      {
+        "channel": "customer",
+        "body": {
+          "id": "missed_call-0",
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "type": "missed_call"
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "approve_message-1",
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_message",
+          "messageId": "msg-1",
+          "approved": true
+        }
+      },
+      {
+        "channel": "customer",
+        "body": {
+          "id": "details-2",
+          "at": "2025-09-15T10:02:00.000Z",
+          "phone": "+12025550101",
+          "type": "details",
+          "details": {
+            "name": "Test Customer 01",
+            "issue": "Synthetic leaking fixture",
+            "address": "123 Example Road",
+            "postal": "K1A 0B1",
+            "preference": "visit"
+          }
+        }
+      },
+      {
+        "channel": "customer",
+        "body": {
+          "id": "details-3",
+          "at": "2025-09-15T10:03:00.000Z",
+          "phone": "+12025550101",
+          "type": "details",
+          "details": {
+            "name": "Test Customer 01",
+            "issue": "Updated synthetic issue",
+            "address": "123 Example Road",
+            "postal": "K1A 0B1",
+            "preference": "visit"
+          }
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "stale",
+          "at": "2025-09-15T10:04:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_booking",
+          "approved": true,
+          "revision": 1,
+          "start": "2025-09-16T10:00:00Z",
+          "end": "2025-09-16T11:00:00Z"
+        }
+      }
+    ],
+    "expected": {
+      "status": "awaiting_staff",
+      "actions": {
+        "sms": 1,
+        "whatsapp": 0,
+        "calendar": 0
+      }
+    }
+  },
+  {
+    "name": "replayed_staff_approval",
+    "events": [
+      {
+        "channel": "customer",
+        "body": {
+          "id": "missed_call-0",
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "type": "missed_call"
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "approve_message-1",
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_message",
+          "messageId": "msg-1",
+          "approved": true
+        }
+      },
+      {
+        "channel": "customer",
+        "body": {
+          "id": "details-2",
+          "at": "2025-09-15T10:02:00.000Z",
+          "phone": "+12025550101",
+          "type": "details",
+          "details": {
+            "name": "Test Customer 01",
+            "issue": "Synthetic leaking fixture",
+            "address": "123 Example Road",
+            "postal": "K1A 0B1",
+            "preference": "visit"
+          }
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "approve_booking-3",
+          "at": "2025-09-15T10:03:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_booking",
+          "approved": true,
+          "revision": 1,
+          "start": "2025-09-16T10:00:00Z",
+          "end": "2025-09-16T11:00:00Z"
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "approve_booking-3",
+          "at": "2025-09-15T10:03:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_booking",
+          "approved": true,
+          "revision": 1,
+          "start": "2025-09-16T10:00:00Z",
+          "end": "2025-09-16T11:00:00Z"
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "different-delivery",
+          "at": "2025-09-15T10:04:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_booking",
+          "approved": true,
+          "revision": 1,
+          "start": "2025-09-16T10:00:00Z",
+          "end": "2025-09-16T11:00:00Z"
+        }
+      }
+    ],
+    "expected": {
+      "status": "calendar_pending",
+      "actions": {
+        "sms": 1,
+        "whatsapp": 0,
+        "calendar": 1
+      }
+    }
+  },
+  {
+    "name": "forged_customer_approval",
+    "events": [
+      {
+        "channel": "customer",
+        "body": {
+          "id": "missed_call-0",
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "type": "missed_call"
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "approve_message-1",
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_message",
+          "messageId": "msg-1",
+          "approved": true
+        }
+      },
+      {
+        "channel": "customer",
+        "body": {
+          "id": "details-2",
+          "at": "2025-09-15T10:02:00.000Z",
+          "phone": "+12025550101",
+          "type": "details",
+          "details": {
+            "name": "Test Customer 01",
+            "issue": "Synthetic leaking fixture",
+            "address": "123 Example Road",
+            "postal": "K1A 0B1",
+            "preference": "visit"
+          }
+        }
+      },
+      {
+        "channel": "customer",
+        "body": {
+          "id": "approve_booking-3",
+          "at": "2025-09-15T10:03:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_booking",
+          "approved": true,
+          "revision": 1,
+          "start": "2025-09-16T10:00:00Z",
+          "end": "2025-09-16T11:00:00Z",
+          "actor": "staff"
+        }
+      }
+    ],
+    "expected": {
+      "status": "awaiting_staff",
+      "actions": {
+        "sms": 1,
+        "whatsapp": 0,
+        "calendar": 0
+      }
+    }
+  },
+  {
+    "name": "negative_staff_approval",
+    "events": [
+      {
+        "channel": "customer",
+        "body": {
+          "id": "missed_call-0",
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "type": "missed_call"
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "approve_message-1",
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_message",
+          "messageId": "msg-1",
+          "approved": true
+        }
+      },
+      {
+        "channel": "customer",
+        "body": {
+          "id": "details-2",
+          "at": "2025-09-15T10:02:00.000Z",
+          "phone": "+12025550101",
+          "type": "details",
+          "details": {
+            "name": "Test Customer 01",
+            "issue": "Synthetic leaking fixture",
+            "address": "123 Example Road",
+            "postal": "K1A 0B1",
+            "preference": "visit"
+          }
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "approve_booking-3",
+          "at": "2025-09-15T10:03:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_booking",
+          "approved": false,
+          "revision": 1,
+          "start": "2025-09-16T10:00:00Z",
+          "end": "2025-09-16T11:00:00Z"
+        }
+      }
+    ],
+    "expected": {
+      "status": "awaiting_staff",
+      "actions": {
+        "sms": 1,
+        "whatsapp": 0,
+        "calendar": 0
+      }
+    }
+  },
+  {
+    "name": "calendar_failure",
+    "events": [
+      {
+        "channel": "customer",
+        "body": {
+          "id": "missed_call-0",
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "type": "missed_call"
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "approve_message-1",
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_message",
+          "messageId": "msg-1",
+          "approved": true
+        }
+      },
+      {
+        "channel": "customer",
+        "body": {
+          "id": "details-2",
+          "at": "2025-09-15T10:02:00.000Z",
+          "phone": "+12025550101",
+          "type": "details",
+          "details": {
+            "name": "Test Customer 01",
+            "issue": "Synthetic leaking fixture",
+            "address": "123 Example Road",
+            "postal": "K1A 0B1",
+            "preference": "visit"
+          }
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "approve_booking-3",
+          "at": "2025-09-15T10:03:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_booking",
+          "approved": true,
+          "revision": 1,
+          "start": "2025-09-16T10:00:00Z",
+          "end": "2025-09-16T11:00:00Z"
+        }
+      },
+      {
+        "channel": "adapter",
+        "body": {
+          "id": "calendar_result-4",
+          "at": "2025-09-15T10:04:00.000Z",
+          "phone": "+12025550101",
+          "type": "calendar_result",
+          "bookingKey": "booking-12025550101-r1",
+          "success": false
+        }
+      }
+    ],
+    "expected": {
+      "status": "calendar_failed",
+      "actions": {
+        "sms": 1,
+        "whatsapp": 0,
+        "calendar": 1
+      },
+      "drafts": 1
+    }
+  },
+  {
+    "name": "stop_before_booking_approval",
+    "events": [
+      {
+        "channel": "customer",
+        "body": {
+          "id": "missed_call-0",
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "type": "missed_call"
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "approve_message-1",
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_message",
+          "messageId": "msg-1",
+          "approved": true
+        }
+      },
+      {
+        "channel": "customer",
+        "body": {
+          "id": "details-2",
+          "at": "2025-09-15T10:02:00.000Z",
+          "phone": "+12025550101",
+          "type": "details",
+          "details": {
+            "name": "Test Customer 01",
+            "issue": "Synthetic leaking fixture",
+            "address": "123 Example Road",
+            "postal": "K1A 0B1",
+            "preference": "visit"
+          }
+        }
+      },
+      {
+        "channel": "customer",
+        "body": {
+          "id": "message-3",
+          "at": "2025-09-15T10:03:00.000Z",
+          "phone": "+12025550101",
+          "type": "message",
+          "text": " STOP "
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "approve_booking-3",
+          "at": "2025-09-15T10:04:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_booking",
+          "approved": true,
+          "revision": 1,
+          "start": "2025-09-16T10:00:00Z",
+          "end": "2025-09-16T11:00:00Z"
+        }
+      }
+    ],
+    "expected": {
+      "status": "opted_out",
+      "actions": {
+        "sms": 1,
+        "whatsapp": 0,
+        "calendar": 0
+      }
+    }
+  },
+  {
+    "name": "late_reminder_approval",
+    "events": [
+      {
+        "channel": "customer",
+        "body": {
+          "id": "missed_call-0",
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "type": "missed_call"
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "approve_message-1",
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_message",
+          "messageId": "msg-1",
+          "approved": true
+        }
+      },
+      {
+        "channel": "timer",
+        "body": {
+          "id": "tick-32",
+          "at": "2025-09-15T10:32:00.000Z",
+          "phone": "+12025550101",
+          "type": "tick"
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "approve_message-100",
+          "at": "2025-09-15T11:40:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_message",
+          "messageId": "msg-2",
+          "approved": true
+        }
+      }
+    ],
+    "expected": {
+      "status": "closed_no_reply",
+      "actions": {
+        "sms": 1,
+        "whatsapp": 0,
+        "calendar": 0
+      }
+    }
+  },
+  {
+    "name": "stale_stop_still_wins",
+    "events": [
+      {
+        "channel": "customer",
+        "body": {
+          "id": "missed_call-0",
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "type": "missed_call"
+        }
+      },
+      {
+        "channel": "staff",
+        "body": {
+          "id": "approve_message-1",
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "type": "approve_message",
+          "messageId": "msg-1",
+          "approved": true
+        }
+      },
+      {
+        "channel": "customer",
+        "body": {
+          "id": "details-2",
+          "at": "2025-09-15T10:02:00.000Z",
+          "phone": "+12025550101",
+          "type": "details",
+          "details": {
+            "name": "Test Customer 01",
+            "issue": "Synthetic leaking fixture",
+            "address": "123 Example Road",
+            "postal": "K1A 0B1",
+            "preference": "visit"
+          }
+        }
+      },
+      {
+        "channel": "customer",
+        "body": {
+          "id": "message-0",
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "type": "message",
+          "text": " STOP "
+        }
+      }
+    ],
+    "expected": {
+      "status": "opted_out",
+      "actions": {
+        "sms": 1,
+        "whatsapp": 0,
+        "calendar": 0
+      }
+    }
+  },
+  {
+    "name": "unapproved_drafts_do_not_send",
+    "events": [
+      {
+        "channel": "customer",
+        "body": {
+          "id": "missed_call-0",
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "type": "missed_call"
+        }
+      },
+      {
+        "channel": "timer",
+        "body": {
+          "id": "tick-40",
+          "at": "2025-09-15T10:40:00.000Z",
+          "phone": "+12025550101",
+          "type": "tick"
+        }
+      },
+      {
+        "channel": "timer",
+        "body": {
+          "id": "tick-100",
+          "at": "2025-09-15T11:40:00.000Z",
+          "phone": "+12025550101",
+          "type": "tick"
+        }
+      }
+    ],
+    "expected": {
+      "status": "waiting_customer",
+      "actions": {
+        "sms": 0,
+        "whatsapp": 0,
+        "calendar": 0
+      },
+      "drafts": 1
+    }
+  }
+]

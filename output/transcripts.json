@@ -1,0 +1,1827 @@
+[
+  {
+    "name": "normal_visit",
+    "state": {
+      "contacts": {
+        "+12025550101": {
+          "phone": "+12025550101",
+          "status": "booked",
+          "revision": 1,
+          "messages": [
+            {
+              "id": "msg-1",
+              "purpose": "initial",
+              "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+              "revision": 0,
+              "status": "sent_simulated",
+              "createdAt": 1757930400000,
+              "approvedBy": "staff",
+              "approvedAt": "2025-09-15T10:01:00.000Z"
+            },
+            {
+              "id": "msg-2",
+              "purpose": "confirmation",
+              "text": "Staff confirmed your visit request for 2025-09-16T10:00:00Z.",
+              "revision": 1,
+              "status": "sent_simulated",
+              "createdAt": 1757930640000,
+              "approvedBy": "staff",
+              "approvedAt": "2025-09-15T10:05:00.000Z"
+            }
+          ],
+          "lastMissedAt": 1757930400000,
+          "lastSentAt": 1757930460000,
+          "reminderCreated": false,
+          "escalated": false,
+          "lastEventAt": 1757930700000,
+          "calendar": {
+            "key": "booking-12025550101-r1",
+            "revision": 1,
+            "start": "2025-09-16T10:00:00Z",
+            "end": "2025-09-16T11:00:00Z",
+            "status": "confirmed",
+            "providerEventId": "synthetic-event-01"
+          },
+          "approval": {
+            "revision": 1,
+            "actor": "staff",
+            "eventId": "approve_booking-3"
+          },
+          "details": {
+            "name": "Test Customer 01",
+            "issue": "Synthetic leaking fixture",
+            "address": "123 Example Road",
+            "postal": "K1A0B1",
+            "preference": "visit"
+          },
+          "requestedAt": 1757930520000
+        }
+      },
+      "seen": {
+        "missed_call-0": true,
+        "approve_message-1": true,
+        "details-2": true,
+        "approve_booking-3": true,
+        "calendar_result-4": true,
+        "approve_message-5": true
+      },
+      "log": [
+        {
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "text": "DRAFT msg-1: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "text": "SEND initial: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:02:00.000Z",
+          "phone": "+12025550101",
+          "text": "REQUEST revision 1: {\"name\":\"Test Customer 01\",\"issue\":\"Synthetic leaking fixture\",\"address\":\"123 Example Road\",\"postal\":\"K1A0B1\",\"preference\":\"visit\"}; no slot promised"
+        },
+        {
+          "at": "2025-09-15T10:03:00.000Z",
+          "phone": "+12025550101",
+          "text": "CALENDAR REQUEST approved by staff for revision 1"
+        },
+        {
+          "at": "2025-09-15T10:04:00.000Z",
+          "phone": "+12025550101",
+          "text": "DRAFT msg-2: Staff confirmed your visit request for 2025-09-16T10:00:00Z."
+        },
+        {
+          "at": "2025-09-15T10:05:00.000Z",
+          "phone": "+12025550101",
+          "text": "SEND confirmation: Staff confirmed your visit request for 2025-09-16T10:00:00Z."
+        }
+      ],
+      "sequence": 2
+    },
+    "actions": [
+      {
+        "kind": "sms",
+        "phone": "+12025550101",
+        "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+        "messageId": "msg-1",
+        "revision": 0,
+        "approved": true
+      },
+      {
+        "kind": "calendar",
+        "phone": "+12025550101",
+        "revision": 1,
+        "approved": true,
+        "approvalId": "approve_booking-3",
+        "bookingKey": "booking-12025550101-r1",
+        "start": "2025-09-16T10:00:00Z",
+        "end": "2025-09-16T11:00:00Z",
+        "details": {
+          "name": "Test Customer 01",
+          "issue": "Synthetic leaking fixture",
+          "address": "123 Example Road",
+          "postal": "K1A0B1",
+          "preference": "visit"
+        }
+      },
+      {
+        "kind": "whatsapp",
+        "phone": "+12025550101",
+        "text": "Staff confirmed your visit request for 2025-09-16T10:00:00Z.",
+        "messageId": "msg-2",
+        "revision": 1,
+        "approved": true
+      }
+    ]
+  },
+  {
+    "name": "normal_callback",
+    "state": {
+      "contacts": {
+        "+12025550101": {
+          "phone": "+12025550101",
+          "status": "booked",
+          "revision": 1,
+          "messages": [
+            {
+              "id": "msg-1",
+              "purpose": "initial",
+              "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+              "revision": 0,
+              "status": "sent_simulated",
+              "createdAt": 1757930400000,
+              "approvedBy": "staff",
+              "approvedAt": "2025-09-15T10:01:00.000Z"
+            },
+            {
+              "id": "msg-2",
+              "purpose": "confirmation",
+              "text": "Staff confirmed your callback request for 2025-09-16T10:00:00Z.",
+              "revision": 1,
+              "status": "sent_simulated",
+              "createdAt": 1757930640000,
+              "approvedBy": "staff",
+              "approvedAt": "2025-09-15T10:05:00.000Z"
+            }
+          ],
+          "lastMissedAt": 1757930400000,
+          "lastSentAt": 1757930460000,
+          "reminderCreated": false,
+          "escalated": false,
+          "lastEventAt": 1757930700000,
+          "calendar": {
+            "key": "booking-12025550101-r1",
+            "revision": 1,
+            "start": "2025-09-16T10:00:00Z",
+            "end": "2025-09-16T11:00:00Z",
+            "status": "confirmed",
+            "providerEventId": "synthetic-event-01"
+          },
+          "approval": {
+            "revision": 1,
+            "actor": "staff",
+            "eventId": "approve_booking-3"
+          },
+          "details": {
+            "name": "Test Customer 01",
+            "issue": "Synthetic leaking fixture",
+            "address": "123 Example Road",
+            "postal": "K1A0B1",
+            "preference": "callback"
+          },
+          "requestedAt": 1757930520000
+        }
+      },
+      "seen": {
+        "missed_call-0": true,
+        "approve_message-1": true,
+        "details-2": true,
+        "approve_booking-3": true,
+        "calendar_result-4": true,
+        "approve_message-5": true
+      },
+      "log": [
+        {
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "text": "DRAFT msg-1: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "text": "SEND initial: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:02:00.000Z",
+          "phone": "+12025550101",
+          "text": "REQUEST revision 1: {\"name\":\"Test Customer 01\",\"issue\":\"Synthetic leaking fixture\",\"address\":\"123 Example Road\",\"postal\":\"K1A0B1\",\"preference\":\"callback\"}; no slot promised"
+        },
+        {
+          "at": "2025-09-15T10:03:00.000Z",
+          "phone": "+12025550101",
+          "text": "CALENDAR REQUEST approved by staff for revision 1"
+        },
+        {
+          "at": "2025-09-15T10:04:00.000Z",
+          "phone": "+12025550101",
+          "text": "DRAFT msg-2: Staff confirmed your callback request for 2025-09-16T10:00:00Z."
+        },
+        {
+          "at": "2025-09-15T10:05:00.000Z",
+          "phone": "+12025550101",
+          "text": "SEND confirmation: Staff confirmed your callback request for 2025-09-16T10:00:00Z."
+        }
+      ],
+      "sequence": 2
+    },
+    "actions": [
+      {
+        "kind": "sms",
+        "phone": "+12025550101",
+        "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+        "messageId": "msg-1",
+        "revision": 0,
+        "approved": true
+      },
+      {
+        "kind": "calendar",
+        "phone": "+12025550101",
+        "revision": 1,
+        "approved": true,
+        "approvalId": "approve_booking-3",
+        "bookingKey": "booking-12025550101-r1",
+        "start": "2025-09-16T10:00:00Z",
+        "end": "2025-09-16T11:00:00Z",
+        "details": {
+          "name": "Test Customer 01",
+          "issue": "Synthetic leaking fixture",
+          "address": "123 Example Road",
+          "postal": "K1A0B1",
+          "preference": "callback"
+        }
+      },
+      {
+        "kind": "whatsapp",
+        "phone": "+12025550101",
+        "text": "Staff confirmed your callback request for 2025-09-16T10:00:00Z.",
+        "messageId": "msg-2",
+        "revision": 1,
+        "approved": true
+      }
+    ]
+  },
+  {
+    "name": "duplicate_missed_calls",
+    "state": {
+      "contacts": {
+        "+12025550101": {
+          "phone": "+12025550101",
+          "status": "waiting_customer",
+          "revision": 0,
+          "messages": [
+            {
+              "id": "msg-1",
+              "purpose": "initial",
+              "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+              "revision": 0,
+              "status": "sent_simulated",
+              "createdAt": 1757930400000,
+              "approvedBy": "staff",
+              "approvedAt": "2025-09-15T10:01:00.000Z"
+            }
+          ],
+          "lastMissedAt": 1757930400000,
+          "lastSentAt": 1757930460000,
+          "reminderCreated": false,
+          "escalated": false,
+          "lastEventAt": 1757930520000,
+          "calendar": null
+        }
+      },
+      "seen": {
+        "missed_call-0": true,
+        "missed_call-1": true,
+        "approve_message-1": true,
+        "missed_call-2": true
+      },
+      "log": [
+        {
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "text": "DRAFT msg-1: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "text": "Suppressed duplicate missed call"
+        },
+        {
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "text": "SEND initial: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:02:00.000Z",
+          "phone": "+12025550101",
+          "text": "Suppressed duplicate missed call"
+        }
+      ],
+      "sequence": 1
+    },
+    "actions": [
+      {
+        "kind": "sms",
+        "phone": "+12025550101",
+        "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+        "messageId": "msg-1",
+        "revision": 0,
+        "approved": true
+      }
+    ]
+  },
+  {
+    "name": "open_conversation_after_duplicate_window",
+    "state": {
+      "contacts": {
+        "+12025550101": {
+          "phone": "+12025550101",
+          "status": "waiting_customer",
+          "revision": 0,
+          "messages": [
+            {
+              "id": "msg-1",
+              "purpose": "initial",
+              "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+              "revision": 0,
+              "status": "sent_simulated",
+              "createdAt": 1757930400000,
+              "approvedBy": "staff",
+              "approvedAt": "2025-09-15T10:01:00.000Z"
+            }
+          ],
+          "lastMissedAt": 1757930760000,
+          "lastSentAt": 1757930460000,
+          "reminderCreated": false,
+          "escalated": false,
+          "lastEventAt": 1757930760000,
+          "calendar": null
+        }
+      },
+      "seen": {
+        "missed_call-0": true,
+        "approve_message-1": true,
+        "missed_call-6": true
+      },
+      "log": [
+        {
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "text": "DRAFT msg-1: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "text": "SEND initial: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:06:00.000Z",
+          "phone": "+12025550101",
+          "text": "Existing conversation retained"
+        }
+      ],
+      "sequence": 1
+    },
+    "actions": [
+      {
+        "kind": "sms",
+        "phone": "+12025550101",
+        "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+        "messageId": "msg-1",
+        "revision": 0,
+        "approved": true
+      }
+    ]
+  },
+  {
+    "name": "plain_text_requires_structured_intake",
+    "state": {
+      "contacts": {
+        "+12025550101": {
+          "phone": "+12025550101",
+          "status": "waiting_customer",
+          "revision": 0,
+          "messages": [
+            {
+              "id": "msg-1",
+              "purpose": "initial",
+              "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+              "revision": 0,
+              "status": "sent_simulated",
+              "createdAt": 1757930400000,
+              "approvedBy": "staff",
+              "approvedAt": "2025-09-15T10:01:00.000Z"
+            }
+          ],
+          "lastMissedAt": 1757930400000,
+          "lastSentAt": 1757930460000,
+          "reminderCreated": false,
+          "escalated": false,
+          "lastEventAt": 1757930520000,
+          "calendar": null
+        }
+      },
+      "seen": {
+        "missed_call-0": true,
+        "approve_message-1": true,
+        "message-2": true
+      },
+      "log": [
+        {
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "text": "DRAFT msg-1: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "text": "SEND initial: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:02:00.000Z",
+          "phone": "+12025550101",
+          "text": "Message received. Collect structured details through the intake form; no free-text inference."
+        }
+      ],
+      "sequence": 1
+    },
+    "actions": [
+      {
+        "kind": "sms",
+        "phone": "+12025550101",
+        "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+        "messageId": "msg-1",
+        "revision": 0,
+        "approved": true
+      }
+    ]
+  },
+  {
+    "name": "no_response_one_reminder",
+    "state": {
+      "contacts": {
+        "+12025550101": {
+          "phone": "+12025550101",
+          "status": "closed_no_reply",
+          "revision": 0,
+          "messages": [
+            {
+              "id": "msg-1",
+              "purpose": "initial",
+              "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+              "revision": 0,
+              "status": "sent_simulated",
+              "createdAt": 1757930400000,
+              "approvedBy": "staff",
+              "approvedAt": "2025-09-15T10:01:00.000Z"
+            },
+            {
+              "id": "msg-2",
+              "purpose": "reminder",
+              "text": "One reminder: reply on WhatsApp if you still need help. Reply STOP to opt out.",
+              "revision": 0,
+              "status": "sent_simulated",
+              "createdAt": 1757932320000,
+              "approvedBy": "staff",
+              "approvedAt": "2025-09-15T10:33:00.000Z"
+            }
+          ],
+          "lastMissedAt": 1757930400000,
+          "lastSentAt": 1757930460000,
+          "reminderCreated": true,
+          "escalated": false,
+          "lastEventAt": 1757932380000,
+          "calendar": null
+        }
+      },
+      "seen": {
+        "missed_call-0": true,
+        "approve_message-1": true,
+        "tick-32": true,
+        "approve_message-33": true,
+        "tick-60": true,
+        "tick-100": true,
+        "tick-200": true
+      },
+      "log": [
+        {
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "text": "DRAFT msg-1: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "text": "SEND initial: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:32:00.000Z",
+          "phone": "+12025550101",
+          "text": "DRAFT msg-2: One reminder: reply on WhatsApp if you still need help. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:33:00.000Z",
+          "phone": "+12025550101",
+          "text": "SEND reminder: One reminder: reply on WhatsApp if you still need help. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T11:40:00.000Z",
+          "phone": "+12025550101",
+          "text": "Closed after no reply"
+        }
+      ],
+      "sequence": 2
+    },
+    "actions": [
+      {
+        "kind": "sms",
+        "phone": "+12025550101",
+        "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+        "messageId": "msg-1",
+        "revision": 0,
+        "approved": true
+      },
+      {
+        "kind": "whatsapp",
+        "phone": "+12025550101",
+        "text": "One reminder: reply on WhatsApp if you still need help. Reply STOP to opt out.",
+        "messageId": "msg-2",
+        "revision": 0,
+        "approved": true
+      }
+    ]
+  },
+  {
+    "name": "stop_before_send",
+    "state": {
+      "contacts": {
+        "+12025550101": {
+          "phone": "+12025550101",
+          "status": "opted_out",
+          "revision": 0,
+          "messages": [
+            {
+              "id": "msg-1",
+              "purpose": "initial",
+              "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+              "revision": 0,
+              "status": "cancelled",
+              "createdAt": 1757930400000
+            }
+          ],
+          "lastMissedAt": 1757930400000,
+          "lastSentAt": null,
+          "reminderCreated": false,
+          "escalated": false,
+          "lastEventAt": 1757931600000,
+          "calendar": null
+        }
+      },
+      "seen": {
+        "missed_call-0": true,
+        "message-1": true,
+        "approve_message-1": true,
+        "missed_call-20": true,
+        "tick-100": true
+      },
+      "log": [
+        {
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "text": "DRAFT msg-1: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "text": "STOP: cancelled queued messages; future contact blocked"
+        },
+        {
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "text": "Suppressed: opted out"
+        },
+        {
+          "at": "2025-09-15T10:20:00.000Z",
+          "phone": "+12025550101",
+          "text": "Suppressed: opted out"
+        }
+      ],
+      "sequence": 1
+    },
+    "actions": []
+  },
+  {
+    "name": "stop_cancels_reminder",
+    "state": {
+      "contacts": {
+        "+12025550101": {
+          "phone": "+12025550101",
+          "status": "opted_out",
+          "revision": 0,
+          "messages": [
+            {
+              "id": "msg-1",
+              "purpose": "initial",
+              "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+              "revision": 0,
+              "status": "sent_simulated",
+              "createdAt": 1757930400000,
+              "approvedBy": "staff",
+              "approvedAt": "2025-09-15T10:01:00.000Z"
+            },
+            {
+              "id": "msg-2",
+              "purpose": "reminder",
+              "text": "One reminder: reply on WhatsApp if you still need help. Reply STOP to opt out.",
+              "revision": 0,
+              "status": "cancelled",
+              "createdAt": 1757932320000
+            }
+          ],
+          "lastMissedAt": 1757930400000,
+          "lastSentAt": 1757930460000,
+          "reminderCreated": true,
+          "escalated": false,
+          "lastEventAt": 1757932440000,
+          "calendar": null
+        }
+      },
+      "seen": {
+        "missed_call-0": true,
+        "approve_message-1": true,
+        "tick-32": true,
+        "message-33": true,
+        "approve_message-34": true
+      },
+      "log": [
+        {
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "text": "DRAFT msg-1: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "text": "SEND initial: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:32:00.000Z",
+          "phone": "+12025550101",
+          "text": "DRAFT msg-2: One reminder: reply on WhatsApp if you still need help. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:33:00.000Z",
+          "phone": "+12025550101",
+          "text": "STOP: cancelled queued messages; future contact blocked"
+        },
+        {
+          "at": "2025-09-15T10:34:00.000Z",
+          "phone": "+12025550101",
+          "text": "Suppressed: opted out"
+        }
+      ],
+      "sequence": 2
+    },
+    "actions": [
+      {
+        "kind": "sms",
+        "phone": "+12025550101",
+        "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+        "messageId": "msg-1",
+        "revision": 0,
+        "approved": true
+      }
+    ]
+  },
+  {
+    "name": "outside_business_hours",
+    "state": {
+      "contacts": {
+        "+12025550101": {
+          "phone": "+12025550101",
+          "status": "waiting_customer",
+          "revision": 0,
+          "messages": [
+            {
+              "id": "msg-1",
+              "purpose": "initial",
+              "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. We are outside business hours; staff will review when open. Reply STOP to opt out.",
+              "revision": 0,
+              "status": "needs_staff_approval",
+              "createdAt": 1757901600000
+            }
+          ],
+          "lastMissedAt": 1757901600000,
+          "lastSentAt": null,
+          "reminderCreated": false,
+          "escalated": false,
+          "lastEventAt": 1757901600000,
+          "calendar": null
+        }
+      },
+      "seen": {
+        "missed_call-0": true
+      },
+      "log": [
+        {
+          "at": "2025-09-15T02:00:00Z",
+          "phone": "+12025550101",
+          "text": "DRAFT msg-1: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. We are outside business hours; staff will review when open. Reply STOP to opt out."
+        }
+      ],
+      "sequence": 1
+    },
+    "actions": []
+  },
+  {
+    "name": "staff_escalation",
+    "state": {
+      "contacts": {
+        "+12025550101": {
+          "phone": "+12025550101",
+          "status": "awaiting_staff",
+          "revision": 1,
+          "messages": [
+            {
+              "id": "msg-1",
+              "purpose": "initial",
+              "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+              "revision": 0,
+              "status": "sent_simulated",
+              "createdAt": 1757930400000,
+              "approvedBy": "staff",
+              "approvedAt": "2025-09-15T10:01:00.000Z"
+            }
+          ],
+          "lastMissedAt": 1757930400000,
+          "lastSentAt": 1757930460000,
+          "reminderCreated": false,
+          "escalated": true,
+          "lastEventAt": 1757930520000,
+          "calendar": null,
+          "approval": null,
+          "details": {
+            "name": "Test Customer 01",
+            "issue": "Synthetic leaking fixture",
+            "address": "123 Example Road",
+            "postal": "K1A0B1",
+            "preference": "visit"
+          },
+          "requestedAt": 1757930520000
+        }
+      },
+      "seen": {
+        "missed_call-0": true,
+        "approve_message-1": true,
+        "details-2": true,
+        "tick-48": true,
+        "tick-90": true
+      },
+      "log": [
+        {
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "text": "DRAFT msg-1: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "text": "SEND initial: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:02:00.000Z",
+          "phone": "+12025550101",
+          "text": "REQUEST revision 1: {\"name\":\"Test Customer 01\",\"issue\":\"Synthetic leaking fixture\",\"address\":\"123 Example Road\",\"postal\":\"K1A0B1\",\"preference\":\"visit\"}; no slot promised"
+        },
+        {
+          "at": "2025-09-15T10:48:00.000Z",
+          "phone": "+12025550101",
+          "text": "STAFF ESCALATION: request still unconfirmed"
+        }
+      ],
+      "sequence": 1
+    },
+    "actions": [
+      {
+        "kind": "sms",
+        "phone": "+12025550101",
+        "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+        "messageId": "msg-1",
+        "revision": 0,
+        "approved": true
+      }
+    ]
+  },
+  {
+    "name": "invalid_postal",
+    "state": {
+      "contacts": {
+        "+12025550101": {
+          "phone": "+12025550101",
+          "status": "needs_details",
+          "revision": 1,
+          "messages": [
+            {
+              "id": "msg-1",
+              "purpose": "initial",
+              "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+              "revision": 0,
+              "status": "sent_simulated",
+              "createdAt": 1757930400000,
+              "approvedBy": "staff",
+              "approvedAt": "2025-09-15T10:01:00.000Z"
+            },
+            {
+              "id": "msg-2",
+              "purpose": "clarification",
+              "text": "invalid postal code format. Please correct the details.",
+              "revision": 1,
+              "status": "needs_staff_approval",
+              "createdAt": 1757930520000
+            }
+          ],
+          "lastMissedAt": 1757930400000,
+          "lastSentAt": 1757930460000,
+          "reminderCreated": false,
+          "escalated": false,
+          "lastEventAt": 1757930580000,
+          "calendar": null,
+          "approval": null
+        }
+      },
+      "seen": {
+        "missed_call-0": true,
+        "approve_message-1": true,
+        "details-2": true,
+        "approve_booking-3": true
+      },
+      "log": [
+        {
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "text": "DRAFT msg-1: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "text": "SEND initial: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:02:00.000Z",
+          "phone": "+12025550101",
+          "text": "DRAFT msg-2: invalid postal code format. Please correct the details."
+        },
+        {
+          "at": "2025-09-15T10:02:00.000Z",
+          "phone": "+12025550101",
+          "text": "Request blocked: invalid postal code format"
+        },
+        {
+          "at": "2025-09-15T10:03:00.000Z",
+          "phone": "+12025550101",
+          "text": "Rejected stale, absent or negative booking approval"
+        }
+      ],
+      "sequence": 2
+    },
+    "actions": [
+      {
+        "kind": "sms",
+        "phone": "+12025550101",
+        "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+        "messageId": "msg-1",
+        "revision": 0,
+        "approved": true
+      }
+    ]
+  },
+  {
+    "name": "invalid_address",
+    "state": {
+      "contacts": {
+        "+12025550101": {
+          "phone": "+12025550101",
+          "status": "needs_details",
+          "revision": 1,
+          "messages": [
+            {
+              "id": "msg-1",
+              "purpose": "initial",
+              "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+              "revision": 0,
+              "status": "sent_simulated",
+              "createdAt": 1757930400000,
+              "approvedBy": "staff",
+              "approvedAt": "2025-09-15T10:01:00.000Z"
+            },
+            {
+              "id": "msg-2",
+              "purpose": "clarification",
+              "text": "invalid address format. Please correct the details.",
+              "revision": 1,
+              "status": "needs_staff_approval",
+              "createdAt": 1757930520000
+            }
+          ],
+          "lastMissedAt": 1757930400000,
+          "lastSentAt": 1757930460000,
+          "reminderCreated": false,
+          "escalated": false,
+          "lastEventAt": 1757930580000,
+          "calendar": null,
+          "approval": null
+        }
+      },
+      "seen": {
+        "missed_call-0": true,
+        "approve_message-1": true,
+        "details-2": true,
+        "approve_booking-3": true
+      },
+      "log": [
+        {
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "text": "DRAFT msg-1: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "text": "SEND initial: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:02:00.000Z",
+          "phone": "+12025550101",
+          "text": "DRAFT msg-2: invalid address format. Please correct the details."
+        },
+        {
+          "at": "2025-09-15T10:02:00.000Z",
+          "phone": "+12025550101",
+          "text": "Request blocked: invalid address format"
+        },
+        {
+          "at": "2025-09-15T10:03:00.000Z",
+          "phone": "+12025550101",
+          "text": "Rejected stale, absent or negative booking approval"
+        }
+      ],
+      "sequence": 2
+    },
+    "actions": [
+      {
+        "kind": "sms",
+        "phone": "+12025550101",
+        "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+        "messageId": "msg-1",
+        "revision": 0,
+        "approved": true
+      }
+    ]
+  },
+  {
+    "name": "outside_service_area",
+    "state": {
+      "contacts": {
+        "+12025550101": {
+          "phone": "+12025550101",
+          "status": "needs_details",
+          "revision": 1,
+          "messages": [
+            {
+              "id": "msg-1",
+              "purpose": "initial",
+              "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+              "revision": 0,
+              "status": "sent_simulated",
+              "createdAt": 1757930400000,
+              "approvedBy": "staff",
+              "approvedAt": "2025-09-15T10:01:00.000Z"
+            },
+            {
+              "id": "msg-2",
+              "purpose": "clarification",
+              "text": "outside service area. Please correct the details.",
+              "revision": 1,
+              "status": "needs_staff_approval",
+              "createdAt": 1757930520000
+            }
+          ],
+          "lastMissedAt": 1757930400000,
+          "lastSentAt": 1757930460000,
+          "reminderCreated": false,
+          "escalated": false,
+          "lastEventAt": 1757930580000,
+          "calendar": null,
+          "approval": null
+        }
+      },
+      "seen": {
+        "missed_call-0": true,
+        "approve_message-1": true,
+        "details-2": true,
+        "approve_booking-3": true
+      },
+      "log": [
+        {
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "text": "DRAFT msg-1: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "text": "SEND initial: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:02:00.000Z",
+          "phone": "+12025550101",
+          "text": "DRAFT msg-2: outside service area. Please correct the details."
+        },
+        {
+          "at": "2025-09-15T10:02:00.000Z",
+          "phone": "+12025550101",
+          "text": "Request blocked: outside service area"
+        },
+        {
+          "at": "2025-09-15T10:03:00.000Z",
+          "phone": "+12025550101",
+          "text": "Rejected stale, absent or negative booking approval"
+        }
+      ],
+      "sequence": 2
+    },
+    "actions": [
+      {
+        "kind": "sms",
+        "phone": "+12025550101",
+        "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+        "messageId": "msg-1",
+        "revision": 0,
+        "approved": true
+      }
+    ]
+  },
+  {
+    "name": "stale_approval_after_edit",
+    "state": {
+      "contacts": {
+        "+12025550101": {
+          "phone": "+12025550101",
+          "status": "awaiting_staff",
+          "revision": 2,
+          "messages": [
+            {
+              "id": "msg-1",
+              "purpose": "initial",
+              "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+              "revision": 0,
+              "status": "sent_simulated",
+              "createdAt": 1757930400000,
+              "approvedBy": "staff",
+              "approvedAt": "2025-09-15T10:01:00.000Z"
+            }
+          ],
+          "lastMissedAt": 1757930400000,
+          "lastSentAt": 1757930460000,
+          "reminderCreated": false,
+          "escalated": false,
+          "lastEventAt": 1757930640000,
+          "calendar": null,
+          "approval": null,
+          "details": {
+            "name": "Test Customer 01",
+            "issue": "Updated synthetic issue",
+            "address": "123 Example Road",
+            "postal": "K1A0B1",
+            "preference": "visit"
+          },
+          "requestedAt": 1757930580000
+        }
+      },
+      "seen": {
+        "missed_call-0": true,
+        "approve_message-1": true,
+        "details-2": true,
+        "details-3": true,
+        "stale": true
+      },
+      "log": [
+        {
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "text": "DRAFT msg-1: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "text": "SEND initial: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:02:00.000Z",
+          "phone": "+12025550101",
+          "text": "REQUEST revision 1: {\"name\":\"Test Customer 01\",\"issue\":\"Synthetic leaking fixture\",\"address\":\"123 Example Road\",\"postal\":\"K1A0B1\",\"preference\":\"visit\"}; no slot promised"
+        },
+        {
+          "at": "2025-09-15T10:03:00.000Z",
+          "phone": "+12025550101",
+          "text": "REQUEST revision 2: {\"name\":\"Test Customer 01\",\"issue\":\"Updated synthetic issue\",\"address\":\"123 Example Road\",\"postal\":\"K1A0B1\",\"preference\":\"visit\"}; no slot promised"
+        },
+        {
+          "at": "2025-09-15T10:04:00.000Z",
+          "phone": "+12025550101",
+          "text": "Rejected stale, absent or negative booking approval"
+        }
+      ],
+      "sequence": 1
+    },
+    "actions": [
+      {
+        "kind": "sms",
+        "phone": "+12025550101",
+        "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+        "messageId": "msg-1",
+        "revision": 0,
+        "approved": true
+      }
+    ]
+  },
+  {
+    "name": "replayed_staff_approval",
+    "state": {
+      "contacts": {
+        "+12025550101": {
+          "phone": "+12025550101",
+          "status": "calendar_pending",
+          "revision": 1,
+          "messages": [
+            {
+              "id": "msg-1",
+              "purpose": "initial",
+              "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+              "revision": 0,
+              "status": "sent_simulated",
+              "createdAt": 1757930400000,
+              "approvedBy": "staff",
+              "approvedAt": "2025-09-15T10:01:00.000Z"
+            }
+          ],
+          "lastMissedAt": 1757930400000,
+          "lastSentAt": 1757930460000,
+          "reminderCreated": false,
+          "escalated": false,
+          "lastEventAt": 1757930640000,
+          "calendar": {
+            "key": "booking-12025550101-r1",
+            "revision": 1,
+            "start": "2025-09-16T10:00:00Z",
+            "end": "2025-09-16T11:00:00Z",
+            "status": "pending"
+          },
+          "approval": {
+            "revision": 1,
+            "actor": "staff",
+            "eventId": "approve_booking-3"
+          },
+          "details": {
+            "name": "Test Customer 01",
+            "issue": "Synthetic leaking fixture",
+            "address": "123 Example Road",
+            "postal": "K1A0B1",
+            "preference": "visit"
+          },
+          "requestedAt": 1757930520000
+        }
+      },
+      "seen": {
+        "missed_call-0": true,
+        "approve_message-1": true,
+        "details-2": true,
+        "approve_booking-3": true,
+        "different-delivery": true
+      },
+      "log": [
+        {
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "text": "DRAFT msg-1: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "text": "SEND initial: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:02:00.000Z",
+          "phone": "+12025550101",
+          "text": "REQUEST revision 1: {\"name\":\"Test Customer 01\",\"issue\":\"Synthetic leaking fixture\",\"address\":\"123 Example Road\",\"postal\":\"K1A0B1\",\"preference\":\"visit\"}; no slot promised"
+        },
+        {
+          "at": "2025-09-15T10:03:00.000Z",
+          "phone": "+12025550101",
+          "text": "CALENDAR REQUEST approved by staff for revision 1"
+        },
+        {
+          "at": "2025-09-15T10:03:00.000Z",
+          "phone": "+12025550101",
+          "text": "Ignored replay approve_booking-3"
+        },
+        {
+          "at": "2025-09-15T10:04:00.000Z",
+          "phone": "+12025550101",
+          "text": "Rejected stale, absent or negative booking approval"
+        }
+      ],
+      "sequence": 1
+    },
+    "actions": [
+      {
+        "kind": "sms",
+        "phone": "+12025550101",
+        "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+        "messageId": "msg-1",
+        "revision": 0,
+        "approved": true
+      },
+      {
+        "kind": "calendar",
+        "phone": "+12025550101",
+        "revision": 1,
+        "approved": true,
+        "approvalId": "approve_booking-3",
+        "bookingKey": "booking-12025550101-r1",
+        "start": "2025-09-16T10:00:00Z",
+        "end": "2025-09-16T11:00:00Z",
+        "details": {
+          "name": "Test Customer 01",
+          "issue": "Synthetic leaking fixture",
+          "address": "123 Example Road",
+          "postal": "K1A0B1",
+          "preference": "visit"
+        }
+      }
+    ]
+  },
+  {
+    "name": "forged_customer_approval",
+    "state": {
+      "contacts": {
+        "+12025550101": {
+          "phone": "+12025550101",
+          "status": "awaiting_staff",
+          "revision": 1,
+          "messages": [
+            {
+              "id": "msg-1",
+              "purpose": "initial",
+              "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+              "revision": 0,
+              "status": "sent_simulated",
+              "createdAt": 1757930400000,
+              "approvedBy": "staff",
+              "approvedAt": "2025-09-15T10:01:00.000Z"
+            }
+          ],
+          "lastMissedAt": 1757930400000,
+          "lastSentAt": 1757930460000,
+          "reminderCreated": false,
+          "escalated": false,
+          "lastEventAt": 1757930580000,
+          "calendar": null,
+          "approval": null,
+          "details": {
+            "name": "Test Customer 01",
+            "issue": "Synthetic leaking fixture",
+            "address": "123 Example Road",
+            "postal": "K1A0B1",
+            "preference": "visit"
+          },
+          "requestedAt": 1757930520000
+        }
+      },
+      "seen": {
+        "missed_call-0": true,
+        "approve_message-1": true,
+        "details-2": true,
+        "approve_booking-3": true
+      },
+      "log": [
+        {
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "text": "DRAFT msg-1: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "text": "SEND initial: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:02:00.000Z",
+          "phone": "+12025550101",
+          "text": "REQUEST revision 1: {\"name\":\"Test Customer 01\",\"issue\":\"Synthetic leaking fixture\",\"address\":\"123 Example Road\",\"postal\":\"K1A0B1\",\"preference\":\"visit\"}; no slot promised"
+        },
+        {
+          "at": "2025-09-15T10:03:00.000Z",
+          "phone": "+12025550101",
+          "text": "Rejected event for this actor: approve_booking"
+        }
+      ],
+      "sequence": 1
+    },
+    "actions": [
+      {
+        "kind": "sms",
+        "phone": "+12025550101",
+        "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+        "messageId": "msg-1",
+        "revision": 0,
+        "approved": true
+      }
+    ]
+  },
+  {
+    "name": "negative_staff_approval",
+    "state": {
+      "contacts": {
+        "+12025550101": {
+          "phone": "+12025550101",
+          "status": "awaiting_staff",
+          "revision": 1,
+          "messages": [
+            {
+              "id": "msg-1",
+              "purpose": "initial",
+              "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+              "revision": 0,
+              "status": "sent_simulated",
+              "createdAt": 1757930400000,
+              "approvedBy": "staff",
+              "approvedAt": "2025-09-15T10:01:00.000Z"
+            }
+          ],
+          "lastMissedAt": 1757930400000,
+          "lastSentAt": 1757930460000,
+          "reminderCreated": false,
+          "escalated": false,
+          "lastEventAt": 1757930580000,
+          "calendar": null,
+          "approval": null,
+          "details": {
+            "name": "Test Customer 01",
+            "issue": "Synthetic leaking fixture",
+            "address": "123 Example Road",
+            "postal": "K1A0B1",
+            "preference": "visit"
+          },
+          "requestedAt": 1757930520000
+        }
+      },
+      "seen": {
+        "missed_call-0": true,
+        "approve_message-1": true,
+        "details-2": true,
+        "approve_booking-3": true
+      },
+      "log": [
+        {
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "text": "DRAFT msg-1: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "text": "SEND initial: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:02:00.000Z",
+          "phone": "+12025550101",
+          "text": "REQUEST revision 1: {\"name\":\"Test Customer 01\",\"issue\":\"Synthetic leaking fixture\",\"address\":\"123 Example Road\",\"postal\":\"K1A0B1\",\"preference\":\"visit\"}; no slot promised"
+        },
+        {
+          "at": "2025-09-15T10:03:00.000Z",
+          "phone": "+12025550101",
+          "text": "Rejected stale, absent or negative booking approval"
+        }
+      ],
+      "sequence": 1
+    },
+    "actions": [
+      {
+        "kind": "sms",
+        "phone": "+12025550101",
+        "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+        "messageId": "msg-1",
+        "revision": 0,
+        "approved": true
+      }
+    ]
+  },
+  {
+    "name": "calendar_failure",
+    "state": {
+      "contacts": {
+        "+12025550101": {
+          "phone": "+12025550101",
+          "status": "calendar_failed",
+          "revision": 1,
+          "messages": [
+            {
+              "id": "msg-1",
+              "purpose": "initial",
+              "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+              "revision": 0,
+              "status": "sent_simulated",
+              "createdAt": 1757930400000,
+              "approvedBy": "staff",
+              "approvedAt": "2025-09-15T10:01:00.000Z"
+            }
+          ],
+          "lastMissedAt": 1757930400000,
+          "lastSentAt": 1757930460000,
+          "reminderCreated": false,
+          "escalated": false,
+          "lastEventAt": 1757930640000,
+          "calendar": {
+            "key": "booking-12025550101-r1",
+            "revision": 1,
+            "start": "2025-09-16T10:00:00Z",
+            "end": "2025-09-16T11:00:00Z",
+            "status": "failed"
+          },
+          "approval": {
+            "revision": 1,
+            "actor": "staff",
+            "eventId": "approve_booking-3"
+          },
+          "details": {
+            "name": "Test Customer 01",
+            "issue": "Synthetic leaking fixture",
+            "address": "123 Example Road",
+            "postal": "K1A0B1",
+            "preference": "visit"
+          },
+          "requestedAt": 1757930520000
+        }
+      },
+      "seen": {
+        "missed_call-0": true,
+        "approve_message-1": true,
+        "details-2": true,
+        "approve_booking-3": true,
+        "calendar_result-4": true
+      },
+      "log": [
+        {
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "text": "DRAFT msg-1: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "text": "SEND initial: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:02:00.000Z",
+          "phone": "+12025550101",
+          "text": "REQUEST revision 1: {\"name\":\"Test Customer 01\",\"issue\":\"Synthetic leaking fixture\",\"address\":\"123 Example Road\",\"postal\":\"K1A0B1\",\"preference\":\"visit\"}; no slot promised"
+        },
+        {
+          "at": "2025-09-15T10:03:00.000Z",
+          "phone": "+12025550101",
+          "text": "CALENDAR REQUEST approved by staff for revision 1"
+        },
+        {
+          "at": "2025-09-15T10:04:00.000Z",
+          "phone": "+12025550101",
+          "text": "STAFF ACTION: calendar write failed; no customer confirmation"
+        }
+      ],
+      "sequence": 1
+    },
+    "actions": [
+      {
+        "kind": "sms",
+        "phone": "+12025550101",
+        "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+        "messageId": "msg-1",
+        "revision": 0,
+        "approved": true
+      },
+      {
+        "kind": "calendar",
+        "phone": "+12025550101",
+        "revision": 1,
+        "approved": true,
+        "approvalId": "approve_booking-3",
+        "bookingKey": "booking-12025550101-r1",
+        "start": "2025-09-16T10:00:00Z",
+        "end": "2025-09-16T11:00:00Z",
+        "details": {
+          "name": "Test Customer 01",
+          "issue": "Synthetic leaking fixture",
+          "address": "123 Example Road",
+          "postal": "K1A0B1",
+          "preference": "visit"
+        }
+      }
+    ]
+  },
+  {
+    "name": "stop_before_booking_approval",
+    "state": {
+      "contacts": {
+        "+12025550101": {
+          "phone": "+12025550101",
+          "status": "opted_out",
+          "revision": 1,
+          "messages": [
+            {
+              "id": "msg-1",
+              "purpose": "initial",
+              "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+              "revision": 0,
+              "status": "sent_simulated",
+              "createdAt": 1757930400000,
+              "approvedBy": "staff",
+              "approvedAt": "2025-09-15T10:01:00.000Z"
+            }
+          ],
+          "lastMissedAt": 1757930400000,
+          "lastSentAt": 1757930460000,
+          "reminderCreated": false,
+          "escalated": false,
+          "lastEventAt": 1757930640000,
+          "calendar": null,
+          "approval": null,
+          "details": {
+            "name": "Test Customer 01",
+            "issue": "Synthetic leaking fixture",
+            "address": "123 Example Road",
+            "postal": "K1A0B1",
+            "preference": "visit"
+          },
+          "requestedAt": 1757930520000
+        }
+      },
+      "seen": {
+        "missed_call-0": true,
+        "approve_message-1": true,
+        "details-2": true,
+        "message-3": true,
+        "approve_booking-3": true
+      },
+      "log": [
+        {
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "text": "DRAFT msg-1: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "text": "SEND initial: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:02:00.000Z",
+          "phone": "+12025550101",
+          "text": "REQUEST revision 1: {\"name\":\"Test Customer 01\",\"issue\":\"Synthetic leaking fixture\",\"address\":\"123 Example Road\",\"postal\":\"K1A0B1\",\"preference\":\"visit\"}; no slot promised"
+        },
+        {
+          "at": "2025-09-15T10:03:00.000Z",
+          "phone": "+12025550101",
+          "text": "STOP: cancelled queued messages; future contact blocked"
+        },
+        {
+          "at": "2025-09-15T10:04:00.000Z",
+          "phone": "+12025550101",
+          "text": "Suppressed: opted out"
+        }
+      ],
+      "sequence": 1
+    },
+    "actions": [
+      {
+        "kind": "sms",
+        "phone": "+12025550101",
+        "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+        "messageId": "msg-1",
+        "revision": 0,
+        "approved": true
+      }
+    ]
+  },
+  {
+    "name": "late_reminder_approval",
+    "state": {
+      "contacts": {
+        "+12025550101": {
+          "phone": "+12025550101",
+          "status": "closed_no_reply",
+          "revision": 0,
+          "messages": [
+            {
+              "id": "msg-1",
+              "purpose": "initial",
+              "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+              "revision": 0,
+              "status": "sent_simulated",
+              "createdAt": 1757930400000,
+              "approvedBy": "staff",
+              "approvedAt": "2025-09-15T10:01:00.000Z"
+            },
+            {
+              "id": "msg-2",
+              "purpose": "reminder",
+              "text": "One reminder: reply on WhatsApp if you still need help. Reply STOP to opt out.",
+              "revision": 0,
+              "status": "cancelled",
+              "createdAt": 1757932320000
+            }
+          ],
+          "lastMissedAt": 1757930400000,
+          "lastSentAt": 1757930460000,
+          "reminderCreated": true,
+          "escalated": false,
+          "lastEventAt": 1757936400000,
+          "calendar": null
+        }
+      },
+      "seen": {
+        "missed_call-0": true,
+        "approve_message-1": true,
+        "tick-32": true,
+        "approve_message-100": true
+      },
+      "log": [
+        {
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "text": "DRAFT msg-1: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "text": "SEND initial: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:32:00.000Z",
+          "phone": "+12025550101",
+          "text": "DRAFT msg-2: One reminder: reply on WhatsApp if you still need help. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T11:40:00.000Z",
+          "phone": "+12025550101",
+          "text": "Closed after no reply"
+        },
+        {
+          "at": "2025-09-15T11:40:00.000Z",
+          "phone": "+12025550101",
+          "text": "Rejected stale/replayed message approval"
+        }
+      ],
+      "sequence": 2
+    },
+    "actions": [
+      {
+        "kind": "sms",
+        "phone": "+12025550101",
+        "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+        "messageId": "msg-1",
+        "revision": 0,
+        "approved": true
+      }
+    ]
+  },
+  {
+    "name": "stale_stop_still_wins",
+    "state": {
+      "contacts": {
+        "+12025550101": {
+          "phone": "+12025550101",
+          "status": "opted_out",
+          "revision": 1,
+          "messages": [
+            {
+              "id": "msg-1",
+              "purpose": "initial",
+              "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+              "revision": 0,
+              "status": "sent_simulated",
+              "createdAt": 1757930400000,
+              "approvedBy": "staff",
+              "approvedAt": "2025-09-15T10:01:00.000Z"
+            }
+          ],
+          "lastMissedAt": 1757930400000,
+          "lastSentAt": 1757930460000,
+          "reminderCreated": false,
+          "escalated": false,
+          "lastEventAt": 1757930520000,
+          "calendar": null,
+          "approval": null,
+          "details": {
+            "name": "Test Customer 01",
+            "issue": "Synthetic leaking fixture",
+            "address": "123 Example Road",
+            "postal": "K1A0B1",
+            "preference": "visit"
+          },
+          "requestedAt": 1757930520000
+        }
+      },
+      "seen": {
+        "missed_call-0": true,
+        "approve_message-1": true,
+        "details-2": true,
+        "message-0": true
+      },
+      "log": [
+        {
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "text": "DRAFT msg-1: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:01:00.000Z",
+          "phone": "+12025550101",
+          "text": "SEND initial: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        },
+        {
+          "at": "2025-09-15T10:02:00.000Z",
+          "phone": "+12025550101",
+          "text": "REQUEST revision 1: {\"name\":\"Test Customer 01\",\"issue\":\"Synthetic leaking fixture\",\"address\":\"123 Example Road\",\"postal\":\"K1A0B1\",\"preference\":\"visit\"}; no slot promised"
+        },
+        {
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "text": "STOP: cancelled queued messages; future contact blocked"
+        }
+      ],
+      "sequence": 1
+    },
+    "actions": [
+      {
+        "kind": "sms",
+        "phone": "+12025550101",
+        "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+        "messageId": "msg-1",
+        "revision": 0,
+        "approved": true
+      }
+    ]
+  },
+  {
+    "name": "unapproved_drafts_do_not_send",
+    "state": {
+      "contacts": {
+        "+12025550101": {
+          "phone": "+12025550101",
+          "status": "waiting_customer",
+          "revision": 0,
+          "messages": [
+            {
+              "id": "msg-1",
+              "purpose": "initial",
+              "text": "We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out.",
+              "revision": 0,
+              "status": "needs_staff_approval",
+              "createdAt": 1757930400000
+            }
+          ],
+          "lastMissedAt": 1757930400000,
+          "lastSentAt": null,
+          "reminderCreated": false,
+          "escalated": false,
+          "lastEventAt": 1757930400000,
+          "calendar": null
+        }
+      },
+      "seen": {
+        "missed_call-0": true,
+        "tick-40": true,
+        "tick-100": true
+      },
+      "log": [
+        {
+          "at": "2025-09-15T10:00:00.000Z",
+          "phone": "+12025550101",
+          "text": "DRAFT msg-1: We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/12025550199. Reply STOP to opt out."
+        }
+      ],
+      "sequence": 1
+    },
+    "actions": []
+  }
+]

@@ -1,0 +1,15 @@
+{
+  "businessName": "Demo Service 01",
+  "businessDays": ["Mon", "Tue", "Wed", "Thu", "Fri"],
+  "timezone": "UTC",
+  "openHour": 9,
+  "closeHour": 17,
+  "servicePostalPrefixes": ["K1A"],
+  "duplicateMinutes": 5,
+  "reminderMinutes": 30,
+  "stopMinutes": 90,
+  "escalateMinutes": 45,
+  "whatsappPhone": "+12025550199",
+  "dryRun": true,
+  "gatewayBaseUrl": "https://adapter.invalid"
+}

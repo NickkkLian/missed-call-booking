@@ -1,0 +1,749 @@
+{
+  "name": "Missed call booking - synthetic approval demo",
+  "active": false,
+  "nodes": [
+    {
+      "id": "e5b177e58a2b674fbb5f1715",
+      "name": "Manual demo",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "b9560ce4cba49ce631fa1ce8",
+      "name": "Sample conversation",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "return [{json:{demo:true,events:[{\"channel\":\"customer\",\"body\":{\"id\":\"missed_call-0\",\"at\":\"2025-09-15T10:00:00.000Z\",\"phone\":\"+12025550101\",\"type\":\"missed_call\"}},{\"channel\":\"staff\",\"body\":{\"id\":\"approve_message-1\",\"at\":\"2025-09-15T10:01:00.000Z\",\"phone\":\"+12025550101\",\"type\":\"approve_message\",\"messageId\":\"msg-1\",\"approved\":true}},{\"channel\":\"customer\",\"body\":{\"id\":\"details-2\",\"at\":\"2025-09-15T10:02:00.000Z\",\"phone\":\"+12025550101\",\"type\":\"details\",\"details\":{\"name\":\"Test Customer 01\",\"issue\":\"Synthetic leaking fixture\",\"address\":\"123 Example Road\",\"postal\":\"K1A 0B1\",\"preference\":\"visit\"}}},{\"channel\":\"staff\",\"body\":{\"id\":\"approve_booking-3\",\"at\":\"2025-09-15T10:03:00.000Z\",\"phone\":\"+12025550101\",\"type\":\"approve_booking\",\"approved\":true,\"revision\":1,\"start\":\"2025-09-16T10:00:00Z\",\"end\":\"2025-09-16T11:00:00Z\"}},{\"channel\":\"adapter\",\"body\":{\"id\":\"calendar_result-4\",\"at\":\"2025-09-15T10:04:00.000Z\",\"phone\":\"+12025550101\",\"type\":\"calendar_result\",\"bookingKey\":\"booking-12025550101-r1\",\"success\":true,\"providerEventId\":\"synthetic-event-01\"}},{\"channel\":\"staff\",\"body\":{\"id\":\"approve_message-5\",\"at\":\"2025-09-15T10:05:00.000Z\",\"phone\":\"+12025550101\",\"type\":\"approve_message\",\"messageId\":\"msg-2\",\"approved\":true}}]}}];"
+      }
+    },
+    {
+      "id": "32ab1026f7a5cc3e5c999387",
+      "name": "Customer intake",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        520,
+        0
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "demo-booking-customer",
+        "authentication": "headerAuth",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "webhookId": "demo-booking-customer",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_CUSTOMER_CREDENTIAL_ID",
+          "name": "REPLACE_CUSTOMER_HEADER_AUTH"
+        }
+      }
+    },
+    {
+      "id": "60025b92b6960ae3aaf005c9",
+      "name": "Normalise customer",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        780,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const body=$input.first().json.body;\nif(!body||![\"missed_call\",\"message\",\"details\"].includes(body.type))throw new Error('unsupported event type for this authenticated route');\nreturn [{json:{event:{...body,actor:'customer',at:new Date().toISOString()}}}];"
+      }
+    },
+    {
+      "id": "e0088b918abdad1045068a13",
+      "name": "Staff decisions",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        0
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "demo-booking-staff",
+        "authentication": "headerAuth",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "webhookId": "demo-booking-staff",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_STAFF_CREDENTIAL_ID",
+          "name": "REPLACE_STAFF_HEADER_AUTH"
+        }
+      }
+    },
+    {
+      "id": "95f69b39ddca7b8c93bdadeb",
+      "name": "Normalise staff",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1300,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const body=$input.first().json.body;\nif(!body||![\"approve_message\",\"approve_booking\"].includes(body.type))throw new Error('unsupported event type for this authenticated route');\nreturn [{json:{event:{...body,actor:'staff',at:new Date().toISOString()}}}];"
+      }
+    },
+    {
+      "id": "5c427ff98e794032a9e40965",
+      "name": "Calendar receipts",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        220
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "demo-booking-adapter",
+        "authentication": "headerAuth",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "webhookId": "demo-booking-adapter",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_ADAPTER_CREDENTIAL_ID",
+          "name": "REPLACE_ADAPTER_HEADER_AUTH"
+        }
+      }
+    },
+    {
+      "id": "b86d56a44314f9f0a4e2539d",
+      "name": "Normalise adapter",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        220
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const body=$input.first().json.body;\nif(!body||![\"calendar_result\"].includes(body.type))throw new Error('unsupported event type for this authenticated route');\nreturn [{json:{event:{...body,actor:'adapter',at:new Date().toISOString()}}}];"
+      }
+    },
+    {
+      "id": "f9911594896b7c128874c080",
+      "name": "Reminder clock",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        520,
+        220
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "ce1c59374ab48b45d2277ce5",
+      "name": "Normalise timer",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        780,
+        220
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const at=new Date().toISOString();return [{json:{event:{id:'tick-'+at,at,type:'tick',actor:'timer'}}}];"
+      }
+    },
+    {
+      "id": "0ce00bb4d9ea779f026c123f",
+      "name": "Business configuration",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        220
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const config={\"businessName\":\"Demo Service 01\",\"businessDays\":[\"Mon\",\"Tue\",\"Wed\",\"Thu\",\"Fri\"],\"timezone\":\"UTC\",\"openHour\":9,\"closeHour\":17,\"servicePostalPrefixes\":[\"K1A\"],\"duplicateMinutes\":5,\"reminderMinutes\":30,\"stopMinutes\":90,\"escalateMinutes\":45,\"whatsappPhone\":\"+12025550199\",\"dryRun\":true,\"gatewayBaseUrl\":\"https://adapter.invalid\"};\n// This node is the single editable business-variable block. Keep dryRun true for this template.\nreturn $input.all().map(item=>({json:{...item.json,config}}));"
+      }
+    },
+    {
+      "id": "4acf57f9f9bf03a8f0902889",
+      "name": "State machine",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1300,
+        220
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "/* Shared verbatim by the n8n Code node and the offline simulator. */\nfunction bookingEngine(state, event, config) {\n  const fail = m => { throw new Error(m); };\n  const testPhone = p => /^\\+1[2-9]\\d{2}55501\\d{2}$/.test(p || '');\n  const now = Date.parse(event.at);\n  if (!Number.isFinite(now) || !event.id || typeof event.id !== 'string') fail('event id and ISO time required');\n  for (const k of ['duplicateMinutes','reminderMinutes','stopMinutes','escalateMinutes']) {\n    if (!Number.isFinite(config[k]) || config[k] <= 0) fail('invalid configuration '+k);\n  }\n  if(config.stopMinutes<=config.reminderMinutes) fail('stopMinutes must exceed reminderMinutes');\n  state.contacts ||= {}; state.seen ||= {}; state.log ||= []; state.sequence ||= 0;\n  const actions=[];\n  const log=(phone,text)=>state.log.push({at:event.at,phone,text});\n  if(state.seen[event.id]) {log(event.phone||'', 'Ignored replay '+event.id);return {state,actions};}\n  state.seen[event.id]=true;\n  const hours = () => {\n    const parts = new Intl.DateTimeFormat('en-US',{timeZone:config.timezone,weekday:'short',hour:'2-digit',hourCycle:'h23'}).formatToParts(new Date(now));\n    const val=t=>parts.find(p=>p.type===t)?.value;\n    return config.businessDays.includes(val('weekday')) && Number(val('hour'))>=config.openHour && Number(val('hour'))<config.closeHour;\n  };\n  const draft=(c,purpose,text)=>{\n    const id='msg-'+(++state.sequence);\n    c.messages.push({id,purpose,text,revision:c.revision,status:'needs_staff_approval',createdAt:now});\n    log(c.phone,'DRAFT '+id+': '+text);return id;\n  };\n  const invalidate=c=>{ for(const m of c.messages)if(m.status==='needs_staff_approval')m.status='cancelled'; };\n  const tick = c => {\n    if(c.status==='opted_out')return;\n    if(c.status==='waiting_customer' && c.lastSentAt!==null){\n      const elapsed=(now-c.lastSentAt)/60000;\n      if(elapsed>=config.stopMinutes){c.status='closed_no_reply';invalidate(c);log(c.phone,'Closed after no reply');}\n      else if(elapsed>=config.reminderMinutes&&!c.reminderCreated){\n        c.reminderCreated=true;draft(c,'reminder','One reminder: reply on WhatsApp if you still need help. Reply STOP to opt out.');\n      }\n    }\n    if(c.status==='awaiting_staff' && now-c.requestedAt>=config.escalateMinutes*60000&&!c.escalated){\n      c.escalated=true;log(c.phone,'STAFF ESCALATION: request still unconfirmed');\n      // Internal queue entry only. Sending a notification would need its own approval.\n    }\n  };\n  if(event.type==='tick'){\n    if(event.actor!=='timer')fail('tick requires trusted timer');\n    for(const c of Object.values(state.contacts))tick(c);\n    return {state,actions};\n  }\n  if(!testPhone(event.phone))fail('demo accepts reserved test phone numbers only');\n  if(!['customer','staff','adapter'].includes(event.actor))fail('untrusted actor');\n  const phone=event.phone;\n  const c=state.contacts[phone] ||= {phone,status:'new',revision:0,messages:[],lastMissedAt:null,lastSentAt:null,reminderCreated:false,escalated:false,lastEventAt:0,calendar:null};\n  // STOP dominates queued actions and stale timestamps. Consent is never reset by a missed call.\n  if(event.actor==='customer' && event.type==='message' && String(event.text||'').trim().toUpperCase()==='STOP'){\n    c.status='opted_out';invalidate(c);log(phone,'STOP: cancelled queued messages; future contact blocked');return {state,actions};\n  }\n  if(now<c.lastEventAt){log(phone,'Rejected out-of-order event');return {state,actions};}\n  c.lastEventAt=now;\n  if(c.status==='opted_out'){log(phone,'Suppressed: opted out');return {state,actions};}\n  tick(c);\n  if(event.actor==='customer' && event.type==='missed_call'){\n    if(c.lastMissedAt!==null&&now-c.lastMissedAt<config.duplicateMinutes*60000){log(phone,'Suppressed duplicate missed call');return {state,actions};}\n    c.lastMissedAt=now;\n    if(!['new','closed_no_reply'].includes(c.status)){log(phone,'Existing conversation retained');return {state,actions};}\n    c.status='waiting_customer';c.reminderCreated=false;c.lastSentAt=null;\n    const note=hours()?'':' We are outside business hours; staff will review when open.';\n    draft(c,'initial',`We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/${config.whatsappPhone.slice(1)}.${note} Reply STOP to opt out.`);\n  }else if(event.actor==='customer' && event.type==='details'){\n    if(c.calendar){log(phone,'Existing calendar request locked; ask staff to change it');return {state,actions};}\n    const d=event.details||{};let reason='';\n    const postal=String(d.postal||'').toUpperCase().replace(/\\s/g,'');\n    if(!String(d.name||'').trim()||!String(d.issue||'').trim())reason='name and issue required';\n    else if(!['callback','visit'].includes(d.preference))reason='choose callback or visit';\n    else if(!/^\\d{1,5} [A-Za-z][A-Za-z0-9 ]{3,60}$/.test(d.address||''))reason='invalid address format';\n    else if(!/^[ABCEGHJ-NPRSTVXY]\\d[ABCEGHJ-NPRSTV-Z]\\d[ABCEGHJ-NPRSTV-Z]\\d$/.test(postal))reason='invalid postal code format';\n    else if(!config.servicePostalPrefixes.includes(postal.slice(0,3)))reason='outside service area';\n    c.revision++;invalidate(c);c.escalated=false;c.approval=null;\n    if(reason){c.status='needs_details';draft(c,'clarification',reason+'. Please correct the details.');log(phone,'Request blocked: '+reason);}\n    else{\n      c.details={name:String(d.name).trim(),issue:String(d.issue).trim(),address:d.address,postal,preference:d.preference};\n      c.status='awaiting_staff';c.requestedAt=now;\n      log(phone,'REQUEST revision '+c.revision+': '+JSON.stringify(c.details)+'; no slot promised');\n    }\n  }else if(event.actor==='staff'&&event.type==='approve_message'){\n    const m=c.messages.find(m=>m.id===event.messageId);\n    if(!m||m.status!=='needs_staff_approval'||m.revision!==c.revision){log(phone,'Rejected stale/replayed message approval');return {state,actions};}\n    if(!event.approved||event.approved!==true){m.status='rejected';log(phone,'Message rejected by staff');return {state,actions};}\n    m.status='sent_simulated';m.approvedBy='staff';m.approvedAt=event.at;\n    if(m.purpose==='initial')c.lastSentAt=now;\n    actions.push({kind:m.purpose==='initial'?'sms':'whatsapp',phone,text:m.text,messageId:m.id,revision:c.revision,approved:true});\n    log(phone,'SEND '+m.purpose+': '+m.text);\n  }else if(event.actor==='staff'&&event.type==='approve_booking'){\n    if(c.status!=='awaiting_staff'||event.revision!==c.revision||event.approved!==true){log(phone,'Rejected stale, absent or negative booking approval');return {state,actions};}\n    const start=Date.parse(event.start),end=Date.parse(event.end);\n    if(!Number.isFinite(start)||!Number.isFinite(end)||start<=now||end<=start){log(phone,'Rejected invalid appointment time');return {state,actions};}\n    c.approval={revision:c.revision,actor:'staff',eventId:event.id};\n    c.calendar={key:'booking-'+phone.slice(1)+'-r'+c.revision,revision:c.revision,start:event.start,end:event.end,status:'pending'};\n    c.status='calendar_pending';\n    actions.push({kind:'calendar',phone,revision:c.revision,approved:true,approvalId:event.id,bookingKey:c.calendar.key,start:event.start,end:event.end,details:c.details});\n    log(phone,'CALENDAR REQUEST approved by staff for revision '+c.revision);\n  }else if(event.actor==='adapter'&&event.type==='calendar_result'){\n    if(c.status!=='calendar_pending'||event.bookingKey!==c.calendar?.key){log(phone,'Ignored stale calendar result');return {state,actions};}\n    if(event.success===true&&typeof event.providerEventId==='string'&&event.providerEventId){\n      c.calendar.status='confirmed';c.calendar.providerEventId=event.providerEventId;c.status='booked';\n      draft(c,'confirmation',`Staff confirmed your ${c.details.preference} request for ${c.calendar.start}.`);\n    }else{c.calendar.status='failed';c.status='calendar_failed';log(phone,'STAFF ACTION: calendar write failed; no customer confirmation');}\n  }else if(event.actor==='customer'&&event.type==='message'){\n    log(phone,'Message received. Collect structured details through the intake form; no free-text inference.');\n  }else{log(phone,'Rejected event for this actor: '+event.type);}\n  return {state,actions};\n}\n\nfunction approvalGuard(action,state,kind){\n  const c=state.contacts?.[action.phone];\n  if(!c||c.status==='opted_out'||action.approved!==true)throw new Error('staff approval missing');\n  if(kind==='calendar'){\n    if(action.kind!=='calendar'||c.status!=='calendar_pending'||c.approval?.actor!=='staff'||c.approval.revision!==action.revision||c.revision!==action.revision||c.approval.eventId!==action.approvalId||c.calendar?.key!==action.bookingKey)throw new Error('booking approval does not match current request');\n  }else{\n    const m=c.messages.find(m=>m.id===action.messageId);\n    if(!m||m.approvedBy!=='staff'||m.status!=='sent_simulated'||m.revision!==c.revision||m.text!==action.text||action.revision!==c.revision)throw new Error('message approval does not match current draft');\n  }\n  return action;\n}\n\nif(typeof module!=='undefined')module.exports={bookingEngine,approvalGuard};\n\nconst input=$input.first().json;\nconst store=$getWorkflowStaticData('global');\nif(input.demo){\n let state={};const effects=[];\n for(const entry of input.events){const event={...entry.body,actor:entry.channel};const result=bookingEngine(state,event,input.config);state=result.state;for(const a of result.actions){approvalGuard(a,state,a.kind==='calendar'?'calendar':'message');effects.push(a);}}\n return [{json:{state,actions:[],simulatedActions:effects,config:input.config}}];\n}\nconst result=bookingEngine(store.bookingState||{},input.event,input.config);\nstore.bookingState=result.state;\nreturn [{json:{...result,config:input.config}}];"
+      }
+    },
+    {
+      "id": "3e1654beab977badfc0c2a98",
+      "name": "Review queue",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        440
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "return $input.all().map(item=>({json:{contacts:item.json.state.contacts,log:item.json.state.log,simulatedActions:item.json.simulatedActions||[]}}));"
+      }
+    },
+    {
+      "id": "21317605d61f7226c5a85a18",
+      "name": "Expand actions",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        440
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const data=$input.first().json;return data.actions.map(action=>({json:{action,state:data.state,config:data.config}}));"
+      }
+    },
+    {
+      "id": "3a1f0a46a9e8bac50c48a885",
+      "name": "Calendar action?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        520,
+        440
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "Calendar-action?",
+              "leftValue": "={{ $json.action.kind }}",
+              "rightValue": "calendar",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "a076b4a7d6d9a4aaa946635c",
+      "name": "Staff booking guard",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        780,
+        440
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "/* Shared verbatim by the n8n Code node and the offline simulator. */\nfunction bookingEngine(state, event, config) {\n  const fail = m => { throw new Error(m); };\n  const testPhone = p => /^\\+1[2-9]\\d{2}55501\\d{2}$/.test(p || '');\n  const now = Date.parse(event.at);\n  if (!Number.isFinite(now) || !event.id || typeof event.id !== 'string') fail('event id and ISO time required');\n  for (const k of ['duplicateMinutes','reminderMinutes','stopMinutes','escalateMinutes']) {\n    if (!Number.isFinite(config[k]) || config[k] <= 0) fail('invalid configuration '+k);\n  }\n  if(config.stopMinutes<=config.reminderMinutes) fail('stopMinutes must exceed reminderMinutes');\n  state.contacts ||= {}; state.seen ||= {}; state.log ||= []; state.sequence ||= 0;\n  const actions=[];\n  const log=(phone,text)=>state.log.push({at:event.at,phone,text});\n  if(state.seen[event.id]) {log(event.phone||'', 'Ignored replay '+event.id);return {state,actions};}\n  state.seen[event.id]=true;\n  const hours = () => {\n    const parts = new Intl.DateTimeFormat('en-US',{timeZone:config.timezone,weekday:'short',hour:'2-digit',hourCycle:'h23'}).formatToParts(new Date(now));\n    const val=t=>parts.find(p=>p.type===t)?.value;\n    return config.businessDays.includes(val('weekday')) && Number(val('hour'))>=config.openHour && Number(val('hour'))<config.closeHour;\n  };\n  const draft=(c,purpose,text)=>{\n    const id='msg-'+(++state.sequence);\n    c.messages.push({id,purpose,text,revision:c.revision,status:'needs_staff_approval',createdAt:now});\n    log(c.phone,'DRAFT '+id+': '+text);return id;\n  };\n  const invalidate=c=>{ for(const m of c.messages)if(m.status==='needs_staff_approval')m.status='cancelled'; };\n  const tick = c => {\n    if(c.status==='opted_out')return;\n    if(c.status==='waiting_customer' && c.lastSentAt!==null){\n      const elapsed=(now-c.lastSentAt)/60000;\n      if(elapsed>=config.stopMinutes){c.status='closed_no_reply';invalidate(c);log(c.phone,'Closed after no reply');}\n      else if(elapsed>=config.reminderMinutes&&!c.reminderCreated){\n        c.reminderCreated=true;draft(c,'reminder','One reminder: reply on WhatsApp if you still need help. Reply STOP to opt out.');\n      }\n    }\n    if(c.status==='awaiting_staff' && now-c.requestedAt>=config.escalateMinutes*60000&&!c.escalated){\n      c.escalated=true;log(c.phone,'STAFF ESCALATION: request still unconfirmed');\n      // Internal queue entry only. Sending a notification would need its own approval.\n    }\n  };\n  if(event.type==='tick'){\n    if(event.actor!=='timer')fail('tick requires trusted timer');\n    for(const c of Object.values(state.contacts))tick(c);\n    return {state,actions};\n  }\n  if(!testPhone(event.phone))fail('demo accepts reserved test phone numbers only');\n  if(!['customer','staff','adapter'].includes(event.actor))fail('untrusted actor');\n  const phone=event.phone;\n  const c=state.contacts[phone] ||= {phone,status:'new',revision:0,messages:[],lastMissedAt:null,lastSentAt:null,reminderCreated:false,escalated:false,lastEventAt:0,calendar:null};\n  // STOP dominates queued actions and stale timestamps. Consent is never reset by a missed call.\n  if(event.actor==='customer' && event.type==='message' && String(event.text||'').trim().toUpperCase()==='STOP'){\n    c.status='opted_out';invalidate(c);log(phone,'STOP: cancelled queued messages; future contact blocked');return {state,actions};\n  }\n  if(now<c.lastEventAt){log(phone,'Rejected out-of-order event');return {state,actions};}\n  c.lastEventAt=now;\n  if(c.status==='opted_out'){log(phone,'Suppressed: opted out');return {state,actions};}\n  tick(c);\n  if(event.actor==='customer' && event.type==='missed_call'){\n    if(c.lastMissedAt!==null&&now-c.lastMissedAt<config.duplicateMinutes*60000){log(phone,'Suppressed duplicate missed call');return {state,actions};}\n    c.lastMissedAt=now;\n    if(!['new','closed_no_reply'].includes(c.status)){log(phone,'Existing conversation retained');return {state,actions};}\n    c.status='waiting_customer';c.reminderCreated=false;c.lastSentAt=null;\n    const note=hours()?'':' We are outside business hours; staff will review when open.';\n    draft(c,'initial',`We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/${config.whatsappPhone.slice(1)}.${note} Reply STOP to opt out.`);\n  }else if(event.actor==='customer' && event.type==='details'){\n    if(c.calendar){log(phone,'Existing calendar request locked; ask staff to change it');return {state,actions};}\n    const d=event.details||{};let reason='';\n    const postal=String(d.postal||'').toUpperCase().replace(/\\s/g,'');\n    if(!String(d.name||'').trim()||!String(d.issue||'').trim())reason='name and issue required';\n    else if(!['callback','visit'].includes(d.preference))reason='choose callback or visit';\n    else if(!/^\\d{1,5} [A-Za-z][A-Za-z0-9 ]{3,60}$/.test(d.address||''))reason='invalid address format';\n    else if(!/^[ABCEGHJ-NPRSTVXY]\\d[ABCEGHJ-NPRSTV-Z]\\d[ABCEGHJ-NPRSTV-Z]\\d$/.test(postal))reason='invalid postal code format';\n    else if(!config.servicePostalPrefixes.includes(postal.slice(0,3)))reason='outside service area';\n    c.revision++;invalidate(c);c.escalated=false;c.approval=null;\n    if(reason){c.status='needs_details';draft(c,'clarification',reason+'. Please correct the details.');log(phone,'Request blocked: '+reason);}\n    else{\n      c.details={name:String(d.name).trim(),issue:String(d.issue).trim(),address:d.address,postal,preference:d.preference};\n      c.status='awaiting_staff';c.requestedAt=now;\n      log(phone,'REQUEST revision '+c.revision+': '+JSON.stringify(c.details)+'; no slot promised');\n    }\n  }else if(event.actor==='staff'&&event.type==='approve_message'){\n    const m=c.messages.find(m=>m.id===event.messageId);\n    if(!m||m.status!=='needs_staff_approval'||m.revision!==c.revision){log(phone,'Rejected stale/replayed message approval');return {state,actions};}\n    if(!event.approved||event.approved!==true){m.status='rejected';log(phone,'Message rejected by staff');return {state,actions};}\n    m.status='sent_simulated';m.approvedBy='staff';m.approvedAt=event.at;\n    if(m.purpose==='initial')c.lastSentAt=now;\n    actions.push({kind:m.purpose==='initial'?'sms':'whatsapp',phone,text:m.text,messageId:m.id,revision:c.revision,approved:true});\n    log(phone,'SEND '+m.purpose+': '+m.text);\n  }else if(event.actor==='staff'&&event.type==='approve_booking'){\n    if(c.status!=='awaiting_staff'||event.revision!==c.revision||event.approved!==true){log(phone,'Rejected stale, absent or negative booking approval');return {state,actions};}\n    const start=Date.parse(event.start),end=Date.parse(event.end);\n    if(!Number.isFinite(start)||!Number.isFinite(end)||start<=now||end<=start){log(phone,'Rejected invalid appointment time');return {state,actions};}\n    c.approval={revision:c.revision,actor:'staff',eventId:event.id};\n    c.calendar={key:'booking-'+phone.slice(1)+'-r'+c.revision,revision:c.revision,start:event.start,end:event.end,status:'pending'};\n    c.status='calendar_pending';\n    actions.push({kind:'calendar',phone,revision:c.revision,approved:true,approvalId:event.id,bookingKey:c.calendar.key,start:event.start,end:event.end,details:c.details});\n    log(phone,'CALENDAR REQUEST approved by staff for revision '+c.revision);\n  }else if(event.actor==='adapter'&&event.type==='calendar_result'){\n    if(c.status!=='calendar_pending'||event.bookingKey!==c.calendar?.key){log(phone,'Ignored stale calendar result');return {state,actions};}\n    if(event.success===true&&typeof event.providerEventId==='string'&&event.providerEventId){\n      c.calendar.status='confirmed';c.calendar.providerEventId=event.providerEventId;c.status='booked';\n      draft(c,'confirmation',`Staff confirmed your ${c.details.preference} request for ${c.calendar.start}.`);\n    }else{c.calendar.status='failed';c.status='calendar_failed';log(phone,'STAFF ACTION: calendar write failed; no customer confirmation');}\n  }else if(event.actor==='customer'&&event.type==='message'){\n    log(phone,'Message received. Collect structured details through the intake form; no free-text inference.');\n  }else{log(phone,'Rejected event for this actor: '+event.type);}\n  return {state,actions};\n}\n\nfunction approvalGuard(action,state,kind){\n  const c=state.contacts?.[action.phone];\n  if(!c||c.status==='opted_out'||action.approved!==true)throw new Error('staff approval missing');\n  if(kind==='calendar'){\n    if(action.kind!=='calendar'||c.status!=='calendar_pending'||c.approval?.actor!=='staff'||c.approval.revision!==action.revision||c.revision!==action.revision||c.approval.eventId!==action.approvalId||c.calendar?.key!==action.bookingKey)throw new Error('booking approval does not match current request');\n  }else{\n    const m=c.messages.find(m=>m.id===action.messageId);\n    if(!m||m.approvedBy!=='staff'||m.status!=='sent_simulated'||m.revision!==c.revision||m.text!==action.text||action.revision!==c.revision)throw new Error('message approval does not match current draft');\n  }\n  return action;\n}\n\nif(typeof module!=='undefined')module.exports={bookingEngine,approvalGuard};\n\nreturn $input.all().map(item=>{approvalGuard(item.json.action,item.json.state,'calendar');return item;});"
+      }
+    },
+    {
+      "id": "14ec9dae0653faca07dbf955",
+      "name": "Staff message guard",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        440
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "/* Shared verbatim by the n8n Code node and the offline simulator. */\nfunction bookingEngine(state, event, config) {\n  const fail = m => { throw new Error(m); };\n  const testPhone = p => /^\\+1[2-9]\\d{2}55501\\d{2}$/.test(p || '');\n  const now = Date.parse(event.at);\n  if (!Number.isFinite(now) || !event.id || typeof event.id !== 'string') fail('event id and ISO time required');\n  for (const k of ['duplicateMinutes','reminderMinutes','stopMinutes','escalateMinutes']) {\n    if (!Number.isFinite(config[k]) || config[k] <= 0) fail('invalid configuration '+k);\n  }\n  if(config.stopMinutes<=config.reminderMinutes) fail('stopMinutes must exceed reminderMinutes');\n  state.contacts ||= {}; state.seen ||= {}; state.log ||= []; state.sequence ||= 0;\n  const actions=[];\n  const log=(phone,text)=>state.log.push({at:event.at,phone,text});\n  if(state.seen[event.id]) {log(event.phone||'', 'Ignored replay '+event.id);return {state,actions};}\n  state.seen[event.id]=true;\n  const hours = () => {\n    const parts = new Intl.DateTimeFormat('en-US',{timeZone:config.timezone,weekday:'short',hour:'2-digit',hourCycle:'h23'}).formatToParts(new Date(now));\n    const val=t=>parts.find(p=>p.type===t)?.value;\n    return config.businessDays.includes(val('weekday')) && Number(val('hour'))>=config.openHour && Number(val('hour'))<config.closeHour;\n  };\n  const draft=(c,purpose,text)=>{\n    const id='msg-'+(++state.sequence);\n    c.messages.push({id,purpose,text,revision:c.revision,status:'needs_staff_approval',createdAt:now});\n    log(c.phone,'DRAFT '+id+': '+text);return id;\n  };\n  const invalidate=c=>{ for(const m of c.messages)if(m.status==='needs_staff_approval')m.status='cancelled'; };\n  const tick = c => {\n    if(c.status==='opted_out')return;\n    if(c.status==='waiting_customer' && c.lastSentAt!==null){\n      const elapsed=(now-c.lastSentAt)/60000;\n      if(elapsed>=config.stopMinutes){c.status='closed_no_reply';invalidate(c);log(c.phone,'Closed after no reply');}\n      else if(elapsed>=config.reminderMinutes&&!c.reminderCreated){\n        c.reminderCreated=true;draft(c,'reminder','One reminder: reply on WhatsApp if you still need help. Reply STOP to opt out.');\n      }\n    }\n    if(c.status==='awaiting_staff' && now-c.requestedAt>=config.escalateMinutes*60000&&!c.escalated){\n      c.escalated=true;log(c.phone,'STAFF ESCALATION: request still unconfirmed');\n      // Internal queue entry only. Sending a notification would need its own approval.\n    }\n  };\n  if(event.type==='tick'){\n    if(event.actor!=='timer')fail('tick requires trusted timer');\n    for(const c of Object.values(state.contacts))tick(c);\n    return {state,actions};\n  }\n  if(!testPhone(event.phone))fail('demo accepts reserved test phone numbers only');\n  if(!['customer','staff','adapter'].includes(event.actor))fail('untrusted actor');\n  const phone=event.phone;\n  const c=state.contacts[phone] ||= {phone,status:'new',revision:0,messages:[],lastMissedAt:null,lastSentAt:null,reminderCreated:false,escalated:false,lastEventAt:0,calendar:null};\n  // STOP dominates queued actions and stale timestamps. Consent is never reset by a missed call.\n  if(event.actor==='customer' && event.type==='message' && String(event.text||'').trim().toUpperCase()==='STOP'){\n    c.status='opted_out';invalidate(c);log(phone,'STOP: cancelled queued messages; future contact blocked');return {state,actions};\n  }\n  if(now<c.lastEventAt){log(phone,'Rejected out-of-order event');return {state,actions};}\n  c.lastEventAt=now;\n  if(c.status==='opted_out'){log(phone,'Suppressed: opted out');return {state,actions};}\n  tick(c);\n  if(event.actor==='customer' && event.type==='missed_call'){\n    if(c.lastMissedAt!==null&&now-c.lastMissedAt<config.duplicateMinutes*60000){log(phone,'Suppressed duplicate missed call');return {state,actions};}\n    c.lastMissedAt=now;\n    if(!['new','closed_no_reply'].includes(c.status)){log(phone,'Existing conversation retained');return {state,actions};}\n    c.status='waiting_customer';c.reminderCreated=false;c.lastSentAt=null;\n    const note=hours()?'':' We are outside business hours; staff will review when open.';\n    draft(c,'initial',`We missed your call. Tell us your issue, name, address and callback or visit preference on WhatsApp: https://wa.me/${config.whatsappPhone.slice(1)}.${note} Reply STOP to opt out.`);\n  }else if(event.actor==='customer' && event.type==='details'){\n    if(c.calendar){log(phone,'Existing calendar request locked; ask staff to change it');return {state,actions};}\n    const d=event.details||{};let reason='';\n    const postal=String(d.postal||'').toUpperCase().replace(/\\s/g,'');\n    if(!String(d.name||'').trim()||!String(d.issue||'').trim())reason='name and issue required';\n    else if(!['callback','visit'].includes(d.preference))reason='choose callback or visit';\n    else if(!/^\\d{1,5} [A-Za-z][A-Za-z0-9 ]{3,60}$/.test(d.address||''))reason='invalid address format';\n    else if(!/^[ABCEGHJ-NPRSTVXY]\\d[ABCEGHJ-NPRSTV-Z]\\d[ABCEGHJ-NPRSTV-Z]\\d$/.test(postal))reason='invalid postal code format';\n    else if(!config.servicePostalPrefixes.includes(postal.slice(0,3)))reason='outside service area';\n    c.revision++;invalidate(c);c.escalated=false;c.approval=null;\n    if(reason){c.status='needs_details';draft(c,'clarification',reason+'. Please correct the details.');log(phone,'Request blocked: '+reason);}\n    else{\n      c.details={name:String(d.name).trim(),issue:String(d.issue).trim(),address:d.address,postal,preference:d.preference};\n      c.status='awaiting_staff';c.requestedAt=now;\n      log(phone,'REQUEST revision '+c.revision+': '+JSON.stringify(c.details)+'; no slot promised');\n    }\n  }else if(event.actor==='staff'&&event.type==='approve_message'){\n    const m=c.messages.find(m=>m.id===event.messageId);\n    if(!m||m.status!=='needs_staff_approval'||m.revision!==c.revision){log(phone,'Rejected stale/replayed message approval');return {state,actions};}\n    if(!event.approved||event.approved!==true){m.status='rejected';log(phone,'Message rejected by staff');return {state,actions};}\n    m.status='sent_simulated';m.approvedBy='staff';m.approvedAt=event.at;\n    if(m.purpose==='initial')c.lastSentAt=now;\n    actions.push({kind:m.purpose==='initial'?'sms':'whatsapp',phone,text:m.text,messageId:m.id,revision:c.revision,approved:true});\n    log(phone,'SEND '+m.purpose+': '+m.text);\n  }else if(event.actor==='staff'&&event.type==='approve_booking'){\n    if(c.status!=='awaiting_staff'||event.revision!==c.revision||event.approved!==true){log(phone,'Rejected stale, absent or negative booking approval');return {state,actions};}\n    const start=Date.parse(event.start),end=Date.parse(event.end);\n    if(!Number.isFinite(start)||!Number.isFinite(end)||start<=now||end<=start){log(phone,'Rejected invalid appointment time');return {state,actions};}\n    c.approval={revision:c.revision,actor:'staff',eventId:event.id};\n    c.calendar={key:'booking-'+phone.slice(1)+'-r'+c.revision,revision:c.revision,start:event.start,end:event.end,status:'pending'};\n    c.status='calendar_pending';\n    actions.push({kind:'calendar',phone,revision:c.revision,approved:true,approvalId:event.id,bookingKey:c.calendar.key,start:event.start,end:event.end,details:c.details});\n    log(phone,'CALENDAR REQUEST approved by staff for revision '+c.revision);\n  }else if(event.actor==='adapter'&&event.type==='calendar_result'){\n    if(c.status!=='calendar_pending'||event.bookingKey!==c.calendar?.key){log(phone,'Ignored stale calendar result');return {state,actions};}\n    if(event.success===true&&typeof event.providerEventId==='string'&&event.providerEventId){\n      c.calendar.status='confirmed';c.calendar.providerEventId=event.providerEventId;c.status='booked';\n      draft(c,'confirmation',`Staff confirmed your ${c.details.preference} request for ${c.calendar.start}.`);\n    }else{c.calendar.status='failed';c.status='calendar_failed';log(phone,'STAFF ACTION: calendar write failed; no customer confirmation');}\n  }else if(event.actor==='customer'&&event.type==='message'){\n    log(phone,'Message received. Collect structured details through the intake form; no free-text inference.');\n  }else{log(phone,'Rejected event for this actor: '+event.type);}\n  return {state,actions};\n}\n\nfunction approvalGuard(action,state,kind){\n  const c=state.contacts?.[action.phone];\n  if(!c||c.status==='opted_out'||action.approved!==true)throw new Error('staff approval missing');\n  if(kind==='calendar'){\n    if(action.kind!=='calendar'||c.status!=='calendar_pending'||c.approval?.actor!=='staff'||c.approval.revision!==action.revision||c.revision!==action.revision||c.approval.eventId!==action.approvalId||c.calendar?.key!==action.bookingKey)throw new Error('booking approval does not match current request');\n  }else{\n    const m=c.messages.find(m=>m.id===action.messageId);\n    if(!m||m.approvedBy!=='staff'||m.status!=='sent_simulated'||m.revision!==c.revision||m.text!==action.text||action.revision!==c.revision)throw new Error('message approval does not match current draft');\n  }\n  return action;\n}\n\nif(typeof module!=='undefined')module.exports={bookingEngine,approvalGuard};\n\nreturn $input.all().map(item=>{approvalGuard(item.json.action,item.json.state,'message');return item;});"
+      }
+    },
+    {
+      "id": "88d1fba4d21a38f1b9131db9",
+      "name": "Calendar dry run?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1300,
+        440
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "Calendar-dry-run?",
+              "leftValue": "={{ String($json.config.dryRun) }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "e6df39b5e0ed0022c9fa9b93",
+      "name": "Calendar simulated",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        660
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "return $input.all().map(item=>({json:{simulated:true,action:item.json.action,nextStep:\"Read the review queue; submit an authenticated receipt for calendar outcomes.\"}}));"
+      }
+    },
+    {
+      "id": "77c9aa43e12f02b6a2a3c738",
+      "name": "Write calendar",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        660
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.config.gatewayBaseUrl + '/calendar' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.action) }}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_GATEWAY_CREDENTIAL_ID",
+          "name": "REPLACE_GATEWAY_HEADER_AUTH"
+        }
+      },
+      "onError": "continueErrorOutput",
+      "retryOnFail": false
+    },
+    {
+      "id": "1f1cfb39cf4fd56ef356e104",
+      "name": "Calendar delivery failure",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        660
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "return [{json:{requiresStaff:true,reason:'Calendar delivery failed or outcome unknown. Reconcile with the provider using the action id; do not blindly retry.',result:$input.first().json}}];"
+      }
+    },
+    {
+      "id": "5770738265a0a02bb051b2e8",
+      "name": "Message dry run?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        780,
+        660
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "Message-dry-run?",
+              "leftValue": "={{ String($json.config.dryRun) }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "2fb7c58f660f32404080131f",
+      "name": "Message simulated",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        660
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "return $input.all().map(item=>({json:{simulated:true,action:item.json.action,nextStep:\"Read the review queue; submit an authenticated receipt for calendar outcomes.\"}}));"
+      }
+    },
+    {
+      "id": "93a26b1eaff99b3a84dd8036",
+      "name": "Send message",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1300,
+        660
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.config.gatewayBaseUrl + '/message' }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.action) }}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_GATEWAY_CREDENTIAL_ID",
+          "name": "REPLACE_GATEWAY_HEADER_AUTH"
+        }
+      },
+      "onError": "continueErrorOutput",
+      "retryOnFail": false
+    },
+    {
+      "id": "3102eb76d8def1a06f0e26f8",
+      "name": "Message delivery failure",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        880
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "return [{json:{requiresStaff:true,reason:'Message delivery failed or outcome unknown. Reconcile with the provider using the action id; do not blindly retry.',result:$input.first().json}}];"
+      }
+    },
+    {
+      "id": "10f1b26c626d08884349f4b1",
+      "name": "Read before connecting",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        260,
+        880
+      ],
+      "parameters": {
+        "content": "## Synthetic demo only\nAll sends require staff approval. Default dryRun=true.\nCalendar success needs an authenticated receipt before a confirmation draft exists.\nUse a WhatsApp intake form/adapter to collect structured fields.\nStatic data is a prototype store: do not enable real traffic without transactional persistence and idempotent adapters.\nSee README for configuration and limitations.",
+        "height": 330,
+        "width": 510
+      }
+    }
+  ],
+  "connections": {
+    "Manual demo": {
+      "main": [
+        [
+          {
+            "node": "Sample conversation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sample conversation": {
+      "main": [
+        [
+          {
+            "node": "Business configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Customer intake": {
+      "main": [
+        [
+          {
+            "node": "Normalise customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalise customer": {
+      "main": [
+        [
+          {
+            "node": "Business configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Staff decisions": {
+      "main": [
+        [
+          {
+            "node": "Normalise staff",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalise staff": {
+      "main": [
+        [
+          {
+            "node": "Business configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calendar receipts": {
+      "main": [
+        [
+          {
+            "node": "Normalise adapter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalise adapter": {
+      "main": [
+        [
+          {
+            "node": "Business configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reminder clock": {
+      "main": [
+        [
+          {
+            "node": "Normalise timer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalise timer": {
+      "main": [
+        [
+          {
+            "node": "Business configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Business configuration": {
+      "main": [
+        [
+          {
+            "node": "State machine",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "State machine": {
+      "main": [
+        [
+          {
+            "node": "Review queue",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Expand actions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Expand actions": {
+      "main": [
+        [
+          {
+            "node": "Calendar action?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calendar action?": {
+      "main": [
+        [
+          {
+            "node": "Staff booking guard",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Staff message guard",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Staff booking guard": {
+      "main": [
+        [
+          {
+            "node": "Calendar dry run?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calendar dry run?": {
+      "main": [
+        [
+          {
+            "node": "Calendar simulated",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Write calendar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write calendar": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Calendar delivery failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Staff message guard": {
+      "main": [
+        [
+          {
+            "node": "Message dry run?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message dry run?": {
+      "main": [
+        [
+          {
+            "node": "Message simulated",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Message delivery failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "UTC"
+  },
+  "pinData": {},
+  "tags": []
+}
