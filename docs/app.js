@@ -185,7 +185,31 @@ function viewLog(main) {
 
 /* ---------- render / keys / init ---------- */
 function help() { dialog('Keyboard shortcuts', h('table', {}, [['→ / Space', 'next step (replay)'], ['←', 'previous step'], ['?', 'this help'], ['Esc', 'close']].map(([k, v]) => h('tr', {}, h('td', {}, h('kbd', {}, k)), h('td', { class: 'muted' }, v)))), { ok: 'Close', cancel: null }); }
-function render() {
+// Every render replaces the page's elements, so the control a keyboard user was on disappears and focus drops to <body>:
+// no focus ring, and Tab starts again from the top of the page (found 2026-09-16 with real key presses). The wrapper puts
+// focus back on the same control (same attribute, or the same kind of control at the same position) or, when that control
+// is gone, on the first visible heading of the page.
+function focusKey(el) {
+  if (!el || el === document.body || el === document.documentElement) return null;
+  const scope = el.parentElement && el.parentElement.closest('[id]'), within = scope ? '#' + CSS.escape(scope.id) + ' ' : '', tag = el.tagName.toLowerCase();
+  const tries = ['id', 'data-id', 'data-key', 'data-sort', 'href', 'name'].filter(a => el.getAttribute(a)).map(a => within + tag + '[' + a + '="' + el.getAttribute(a).replace(/["\\]/g, '\\$&') + '"]');
+  const kind = within + tag + (typeof el.className === 'string' && el.className.trim() ? '.' + el.className.trim().split(/\s+/).map(c => CSS.escape(c)).join('.') : '');
+  const index = [...document.querySelectorAll(kind)].indexOf(el);
+  const find = () => { for (const s of tries) { const x = document.querySelector(s); if (x) return x; } return index < 0 ? null : document.querySelectorAll(kind)[index] || null; };
+  find.caret = typeof el.selectionStart === 'number' ? [el.selectionStart, el.selectionEnd] : null;   // a text field keeps its caret
+  return find;
+}
+function restoreFocus(find) {
+  if (!find || (document.activeElement && document.activeElement !== document.body)) return;
+  let el = find();
+  if (!el || !el.getClientRects().length) {
+    el = [...document.querySelectorAll('main h1, main h2, main')].find(x => { const r = x.getBoundingClientRect(); return r.width > 2 && r.height > 2; });
+    if (el && !el.hasAttribute('tabindex')) el.setAttribute('tabindex', '-1');
+  }
+  if (el) { el.focus(); if (find.caret && el.setSelectionRange) try { el.setSelectionRange(find.caret[0], find.caret[1]); } catch (e) { /* not a text field */ } }
+}
+function render() { const find = focusKey(document.activeElement); renderPage(); restoreFocus(find); }
+function renderPage() {
   if (route().view === 'settings') { location.replace('#/config'); return; }   // old address; Settings is now the appearance dialog
   const { view, p } = route(); const main = $('#main'); main.innerHTML = '';
   if (view === 'console') { const sc = p.get('scenario'); if (sc && SC.some(s => s.name === sc)) S.scenario = sc; const m = p.get('mode'); if (m === 'play' || m === 'replay') S.mode = m; const st = parseInt(p.get('step') || '', 10); if (!Number.isNaN(st)) S.step = Math.max(0, Math.min(scenario().events.length, st)); }
