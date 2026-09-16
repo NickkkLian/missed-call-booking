@@ -15,5 +15,25 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
       - run: node demo.js check
+  break:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node demo.js break
+  web:
+    # The page replays scenarios through docs/sim.js + docs/engine.js (the files the browser loads); this proves the replay
+    # reproduces every recorded transcript, that docs/engine.js is byte-identical to engine.js, and that docs/data.js is fresh.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: cmp engine.js docs/engine.js
+      - run: node docs/pack-data.mjs && git diff --exit-code -- docs/data.js
+      - run: node docs/check-sim.mjs

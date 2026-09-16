@@ -1,21 +1,27 @@
-# Missed call booking
+# Callback Desk
 
-A missed call creates an SMS draft that directs a customer to WhatsApp intake. Structured details become a booking request. Staff approve the current request before a calendar action can run, and a successful calendar receipt creates a confirmation draft.
+**Turn missed calls into bookings — staff approve every message and every calendar write.**
 
-**This is an offline n8n template with fictional customer records.** It has not been imported into a running n8n instance. Provider integrations are adapter placeholders. It is not a deployed customer service.
+A missed call creates an SMS draft that points the customer to WhatsApp intake. Structured details become a booking request. Staff approve the current request before a calendar action can run, and only an authenticated success receipt produces a confirmation draft — which staff approve again. Nothing goes out on its own.
 
-## Try it in 60 seconds
+> **This is an offline n8n template with fictional customer records, plus a browser simulator that runs the same state machine.** It has not been imported into a running n8n instance. Provider integrations are adapter placeholders. It is not a deployed customer service.
 
-Tested with Node.js 24.14.1 on macOS 15.7.3. Lower Node.js versions have not been tested. No packages, services, credentials or internet connection are needed.
+[![Check](https://github.com/NickkkLian/missed-call-booking/actions/workflows/check.yml/badge.svg)](https://github.com/NickkkLian/missed-call-booking/actions/workflows/check.yml)
+
+![Callback Desk console: the customer's phone, the staff desk with a draft awaiting approval, and the state card with the last guard decision](docs/screenshot-console.png)
+
+## Try it
+
+**In the browser** — open the [live simulator](https://nickkklian.github.io/missed-call-booking/) (static, no server, no network requests) or `docs/index.html` from a clone. *Replay* steps through any of the 22 scenarios one event at a time; *Play as customer & staff* lets you call, text, send the intake form, approve drafts, pick a calendar slot, simulate the adapter receipt, advance the clock, and try the three attacks the guard exists for (a forged approval on the customer route, a replayed approval, a STOP with an old timestamp). The scenarios page replays all 22 in your tab and shows whether each matches its expected outcome.
+
+**From the command line** — tested with Node.js 24 on macOS; CI runs Node 22 on Ubuntu, Windows and macOS. No packages, services, credentials or internet connection are needed.
 
 ```sh
 node demo.js build
 node demo.js check
 ```
 
-The build prints every conversation and final state. [scenarios.json](scenarios.json) contains the events and explicit expected outcomes. [output/transcripts.json](output/transcripts.json) preserves the full replay.
-
-Expected check result: `CHECK PASS 22/22 scenarios`.
+The build prints every conversation and final state. [scenarios.json](scenarios.json) contains the events and explicit expected outcomes. [output/transcripts.json](output/transcripts.json) preserves the full replay. Expected check result: `CHECK PASS 22/22 scenarios`.
 
 ```mermaid
 flowchart TD
@@ -38,7 +44,17 @@ flowchart TD
     Intake --> Stop[STOP cancels pending messages]
 ```
 
-All outbound messages, including the first SMS and reminders, require a separate staff decision. This deliberately follows the demo's rule that irreversible actions need human confirmation. Preparing the request is automatic; sending it is gated.
+All outbound messages, including the first SMS and reminders, require a separate staff decision. Preparing the request is automatic; sending it is gated.
+
+## The simulator
+
+![Play mode after a full conversation: SMS and WhatsApp threads, a booked request with its booking key, and the guard rejecting a forged approval](docs/screenshot-play.png)
+
+- **One state machine, three places.** `engine.js` is embedded verbatim in the n8n export's Code nodes, executed by the CLI checker, and loaded by the page. `docs/sim.js` feeds events to it exactly the way `demo.js` does; `docs/check-sim.mjs` proves in CI that the page's replay reproduces all 22 recorded transcripts and that `docs/engine.js` is byte-identical to `engine.js`.
+- **The guard is on screen.** The state card always shows the last guard decision — an approval that matches the current request, or `⊘ Rejected event for this actor` when the customer route tries to approve a booking. Rejections are the product working, so they are shown in the log, not as errors.
+- **Everything simulated says so.** Sent messages carry `sent (simulated)`, calendar blocks carry the `bookingKey` and `simulated`, and the adapter receipt in Play mode is a button you press, not something the page fabricates.
+- **Config** exposes the single business-variable block (hours, days, timezone, service-area prefixes, reminder/stop/escalation minutes); read-only adapter fields explain why they are read-only. Replays and the scenario checks always use the defaults from `config.json`.
+- Dark and light themes, 375 px layout with Customer / Staff / Calendar tabs, keyboard stepping (→ / ←), shareable URLs (`#/console?scenario=forged_customer_approval&mode=replay&step=3`).
 
 ## Import and configure
 
@@ -111,16 +127,52 @@ There is no natural-language agent in this demo. A WhatsApp form/adapter must co
 
 Callbacks still require address/postal details in this demonstration because eligibility is checked before either service preference. Staff select the time; customer messages do not reserve calendar capacity.
 
+### Scenario coverage
+
+Which of the 22 scenarios exercise each event type, route and final state. This table is generated from the fixtures and `check` fails if it drifts from them.
+
+<!-- coverage:start -->
+| Event type | Scenarios | Count |
+| --- | --- | ---: |
+| `missed_call` | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22 | 22 |
+| `message` | 5, 7, 8, 19, 21 | 5 |
+| `details` | 1, 2, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21 | 13 |
+| `approve_message` | 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 | 20 |
+| `approve_booking` | 1, 2, 11, 12, 13, 14, 15, 16, 17, 18, 19 | 11 |
+| `calendar_result` | 1, 2, 18 | 3 |
+| `tick` | 6, 7, 8, 10, 20, 22 | 6 |
+
+| Route | Scenarios | Count |
+| --- | --- | ---: |
+| customer | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22 | 22 |
+| staff | 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21 | 20 |
+| adapter | 1, 2, 18 | 3 |
+| timer | 6, 7, 8, 10, 20, 22 | 6 |
+
+| Final status | Scenarios | Count |
+| --- | --- | ---: |
+| `booked` | 1, 2 | 2 |
+| `calendar_pending` | 15 | 1 |
+| `calendar_failed` | 18 | 1 |
+| `awaiting_staff` | 10, 14, 16, 17 | 4 |
+| `needs_details` | 11, 12, 13 | 3 |
+| `waiting_customer` | 3, 4, 5, 9, 22 | 5 |
+| `closed_no_reply` | 6, 20 | 2 |
+| `opted_out` | 7, 8, 19, 21 | 4 |
+
+Scenario numbers follow `scenarios.json` order (1–22). Generated by `node demo.js coverage`; `check` fails if this table and the README drift apart.
+<!-- coverage:end -->
+
 ## Check the guard, including a broken workflow
 
 ```sh
 node demo.js check
 node demo.js break
+node demo.js coverage
+node docs/check-sim.mjs
 ```
 
-The checker verifies connection sources/targets, 26 node contracts, five entry points, credentials/test-number defaults and graph reachability. Removing **Staff booking guard** makes **Write calendar** and **Calendar simulated** unreachable; removing **Staff message guard** makes **Send message** and **Message simulated** unreachable. It also executes the actual embedded guard with a forged action, verifies that the customer route rejects booking approvals, asserts that a plain-text customer's message body is absent from the receipt log, and runs all 22 scenarios against the actual embedded state-machine code, comparing saved transcripts with fresh results.
-
-The included `.gitattributes` keeps source and generated JSON at LF under `core.autocrlf=true`, because the export embeds and compares the state-machine source exactly. The GitHub Actions workflow is configured to run the untouched export on Ubuntu, Windows and macOS with Node 20. Checks in this folder were run locally on macOS; cross-system results should be confirmed on the repository's Actions page after publication.
+The checker verifies connection sources/targets, 26 node contracts, five entry points, credentials/test-number defaults and graph reachability. Removing **Staff booking guard** makes **Write calendar** and **Calendar simulated** unreachable; removing **Staff message guard** makes **Send message** and **Message simulated** unreachable. It also executes the actual embedded guard with a forged action, verifies that the customer route rejects booking approvals, asserts that a plain-text customer's message body is absent from the receipt log, runs all 22 scenarios against the actual embedded state-machine code comparing saved transcripts with fresh results, and checks that the coverage table above matches the fixtures.
 
 `break` tests three separate mutations in temporary copies inside this demo folder:
 
@@ -132,14 +184,33 @@ The included `.gitattributes` keeps source and generated JSON at LF under `core.
 
 Each checker process must exit 1. The demonstration command returns 0 only after observing all three specific failures, and removes its temporary copies; the original source and export stay intact. Process creation and write access to this demo folder are required.
 
+`docs/check-sim.mjs` (Node 22+) replays every scenario through the page's own `docs/sim.js` and `docs/engine.js`, compares final status, action counts, drafts and log length with `scenarios.json` and `output/transcripts.json`, confirms `docs/data.js` is a fresh bundle of the fixtures, includes a negative control (a mutated expectation must be caught), and asserts that a customer-route approval never produces a calendar action. The included `.gitattributes` keeps source and generated JSON at LF under `core.autocrlf=true`, because the export embeds and compares the state-machine source exactly.
+
 ## Limits before real use
 
 - The supplied workflow stays in dry-run mode and accepts only reserved North American `555-01xx` test numbers. NANPA describes that reservation in [555 line numbers](https://nanpa.com/numbering/555-line-numbers). The WhatsApp link illustrates routing; the fictional number has no live account.
 - The HTTP nodes describe adapter contracts at `https://adapter.invalid/calendar` and `/message`; no provider adapter is included. The message adapter must route by action kind and enforce approved WhatsApp templates/windows, consent and sender identity. Those provider policies were not exercised here.
 - A calendar adapter must deduplicate by `bookingKey`, verify availability and send an authenticated success/failure receipt. Message adapters must deduplicate by `messageId` within their deployment. Delivery failures go to a staff-action output, with retries disabled. A timeout is an unknown outcome until reconciled with the provider.
-- `sent_simulated` records an approved dispatch, not proof of provider delivery. No success receipt is fabricated. The offline normal scenario supplies its own clearly synthetic receipt.
+- `sent_simulated` records an approved dispatch, not proof of provider delivery. No success receipt is fabricated. The offline normal scenario supplies its own clearly synthetic receipt; in the browser's Play mode the receipt is a button the user presses.
 - Static data does not provide atomic concurrency, crash recovery, durable opt-outs or a bounded history. Before real use, replace it with a transactional state/outbox store and recheck consent/revision at dispatch time. Serial tests do not prove that STOP and an in-flight request cannot race. Stopping contact does not automatically delete an already-created calendar event.
 - The internal escalation is visible in Review queue; external staff notifications and the staff interface are integration work. The current export cannot be presented as a turnkey live service.
 - Address syntax and postal prefixes do not prove an address exists. There is no geocoding, availability solver, appointment cancellation/rescheduling or emergency triage. Do not use this for urgent repairs that need a human dispatcher.
+- The browser simulator has not been imported into n8n either; it demonstrates the state machine and the approval gate, not the n8n runtime. Play sessions are not saved. The calendar grid is drawn in the configured timezone's hours but positioned on UTC days.
+
+## Repository layout
+
+```
+engine.js               the state machine + approval guard (also embedded in workflow.json)
+demo.js                 CLI: build / check / break / simulate / coverage (Node 22+, no packages)
+config.json             the single business-variable block
+scenarios.json          22 scenarios with events and expected outcomes (generated by build)
+workflow.json           the n8n export (generated by build)
+output/transcripts.json full replay of every scenario (generated by build)
+docs/index.html         the browser simulator (GitHub Pages root)
+docs/sim.js             replay core shared by the page and docs/check-sim.mjs
+docs/engine.js          byte-identical copy of engine.js (CI asserts it)
+docs/data.js            bundled fixtures, regenerated by docs/pack-data.mjs
+docs/design-tokens.css  shared design tokens (light and dark)
+```
 
 MIT licensed. Copyright 2026 Nick Lian.
