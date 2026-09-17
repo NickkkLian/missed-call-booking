@@ -24,7 +24,16 @@ const rel = (due, now) => { const m = mins(due, now); return m >= 0 ? `in ${m}m`
 const route = () => { const raw = location.hash.replace(/^#\/?/, ''); const [path, qs] = raw.split('?'); return { view: path || 'console', p: new URLSearchParams(qs || '') }; };
 const go = (view, params = {}) => { const p = new URLSearchParams(); for (const [k, v] of Object.entries(params)) if (v !== null && v !== undefined && v !== '') p.set(k, v); location.hash = '#/' + view + (p.toString() ? '?' + p : ''); };
 function toast(msg, { ms, kind } = {}) { const box = $('#toasts'); const el = h('div', { class: 'toast enter', role: kind === 'error' ? 'alert' : 'status' }, h('span', {}, msg), h('button', { class: 'btn btn-ghost btn-sm', 'aria-label': 'Dismiss', onclick: () => el.remove() }, '×')); box.append(el); requestAnimationFrame(() => el.classList.remove('enter')); while (box.children.length > 3) box.firstChild.remove(); setTimeout(() => { el.classList.add('leave'); setTimeout(() => el.remove(), 200); }, ms || 4000); }
-function dialog(title, body, { ok = 'OK', cancel = 'Cancel', danger = false } = {}) { return new Promise(res => { const d = $('#dlg'); d.innerHTML = ''; const opener = document.activeElement; const form = h('form', { method: 'dialog' }, h('h2', {}, title), typeof body === 'string' ? h('p', { class: 'muted' }, body) : body, h('div', { class: 'acts' }, cancel && h('button', { class: 'btn', value: 'cancel', type: 'button', onclick: () => d.close('cancel') }, cancel), h('button', { class: 'btn ' + (danger ? 'btn-danger' : 'btn-primary'), value: 'ok', type: 'submit' }, ok))); d.append(form); d.addEventListener('close', () => { res(d.returnValue === 'ok'); opener && opener.focus && opener.focus(); }, { once: true }); d.showModal(); }); }
+// A dialog settles on its own form's submit, its Cancel button, Esc or close, whichever comes first. Relying on the close event
+// alone left OK dead in Chrome after a dialog had once been closed with Esc: that dialog fired no close event again (2026-09-16).
+function dialog(title, body, { ok = 'OK', cancel = 'Cancel', danger = false } = {}) { return new Promise(res => {
+  const d = $('#dlg'); d.innerHTML = ''; const opener = document.activeElement, off = new AbortController(); let settled = false;
+  const settle = yes => { if (settled) return; settled = true; off.abort(); if (d.open) d.close(yes ? 'ok' : 'cancel'); res(yes); opener && opener.focus && opener.focus(); };
+  const form = h('form', { method: 'dialog' }, h('h2', {}, title), typeof body === 'string' ? h('p', { class: 'muted' }, body) : body, h('div', { class: 'acts' }, cancel && h('button', { class: 'btn', value: 'cancel', type: 'button', onclick: () => settle(false) }, cancel), h('button', { class: 'btn ' + (danger ? 'btn-danger' : 'btn-primary'), value: 'ok', type: 'submit' }, ok)));
+  form.addEventListener('submit', e => { e.preventDefault(); settle(true); }, { signal: off.signal });
+  d.addEventListener('cancel', e => { e.preventDefault(); settle(false); }, { signal: off.signal });
+  d.addEventListener('close', () => settle(d.returnValue === 'ok'), { signal: off.signal });
+  d.append(form); d.showModal(); }); }
 
 /* ---------- state ---------- */
 const S = { config: JSON.parse(JSON.stringify(DEFAULT_CONFIG)), pending: null, mode: 'replay', scenario: SC[0].name, step: 0, play: { events: [], now: Date.UTC(2025, 8, 15, 9, 41), seq: 0 }, ui: { chan: 'sms', mtab: 'customer', calSel: null, seenStart: false, filter: 'all' }, results: null };
