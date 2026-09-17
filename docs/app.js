@@ -73,7 +73,7 @@ function renderSubbar() {
   const bar = $('#subbar'); bar.innerHTML = ''; const { view } = route(); if (view !== 'console') { bar.hidden = true; return; } bar.hidden = false;
   const sel = h('select', { 'aria-label': 'Scenario', onchange: e => { const name = e.target.value; if (S.mode === 'play' && S.play.events.length) dialog('Discard this conversation?', 'Switching scenario resets the play session.', { ok: 'Discard', danger: true }).then(ok => { if (ok) { resetPlay(); S.scenario = name; S.step = 0; go('console', { scenario: name, mode: S.mode, step: 0 }); } else render(); }); else { S.scenario = name; S.step = 0; go('console', { scenario: name, mode: S.mode, step: 0 }); } } },
     GROUPS.map(([g, names]) => h('optgroup', { label: g }, names.map(n => { const i = SC.findIndex(s => s.name === n); const r = S.results?.[i]; return h('option', { value: n, selected: n === S.scenario }, `${i + 1} · ${n.replace(/_/g, ' ')}${r && !r.ok ? ' ✗' : ''}`); }))));
-  const seg = h('div', { class: 'seg', style: 'margin:0', role: 'radiogroup', 'aria-label': 'Mode' }, [['replay', 'Replay'], ['play', 'Play as customer & staff']].map(([m, l]) => h('button', { role: 'radio', 'aria-checked': S.mode === m ? 'true' : 'false', onclick: () => { S.mode = m; go('console', { scenario: S.scenario, mode: m, step: S.step }); } }, l)));
+  const seg = h('div', { class: 'seg', style: 'margin:0', role: 'radiogroup', 'aria-label': 'Mode' }, [['replay', 'Replay'], ['play', 'Play as customer & staff']].map(([m, l]) => h('button', { role: 'radio', 'aria-checked': S.mode === m ? 'true' : 'false', onclick: () => { S.mode = m; go('console', { scenario: S.scenario, mode: m, step: S.step, chan: S.ui.chan === 'sms' ? null : S.ui.chan }); } }, l)));
   const pass = S.results.filter(r => r.ok).length;
   bar.append(...[h('span', { class: 'muted', style: 'font-size:var(--text-xs)' }, 'Scenario'), sel, seg, h('span', { class: 'clock' }, '⏱ ' + fmtTime(current().now) + ' ' + tz()),
     S.mode === 'play' ? h('span', { class: 'row', style: 'gap:4px' }, [5, 30, 45, 90].map(m => h('button', { class: 'btn btn-sm', onclick: () => advance(m) }, `+${m}m`))) : null,
@@ -98,7 +98,7 @@ function viewConsole(main) {
   else shown.forEach(x => thread.append(x.el));
   const counts = { sms: items.filter(x => x.chan === 'sms').length, whatsapp: items.filter(x => x.chan === 'whatsapp').length };
   const phone = h('div', { class: 'phone' }, h('div', { class: 'ph-head' }, h('b', {}, PHONE), h('span', { class: 'muted' }, 'Test Customer 01'), h('span', { class: 'spacer' }), c ? statusTag(c.status) : null),
-    h('div', { class: 'chan-tabs', role: 'tablist' }, ['sms', 'whatsapp'].map(ch => h('button', { role: 'tab', 'aria-selected': S.ui.chan === ch ? 'true' : 'false', onclick: () => { S.ui.chan = ch; render(); } }, ch.toUpperCase(), h('span', { class: 'n' }, counts[ch])))), thread);
+    h('div', { class: 'chan-tabs', role: 'tablist' }, ['sms', 'whatsapp'].map(ch => h('button', { role: 'tab', 'aria-selected': S.ui.chan === ch ? 'true' : 'false', onclick: () => { S.ui.chan = ch; go('console', { scenario: S.scenario, mode: S.mode, step: S.step, chan: ch === 'sms' ? null : ch }); } }, ch.toUpperCase(), h('span', { class: 'n' }, counts[ch])))), thread);
   if (play) phone.append(h('div', { class: 'composer' }, h('div', { class: 'row' }, h('button', { class: 'btn btn-sm', onclick: () => emit('missed_call') }, 'Call again'), S.play.events.length ? null : h('button', { class: 'btn btn-sm btn-ghost', title: 'Seed this session with the normal_visit conversation plus one forged approval', onclick: loadExample }, 'Load example conversation'), h('button', { class: 'btn btn-sm', onclick: freeText }, 'Message…'), h('button', { class: 'btn btn-sm', onclick: detailsForm }, 'Send details form'), h('button', { class: 'btn btn-sm', onclick: () => emit('message', { text: ' STOP ' }) }, 'Send STOP')),
     h('details', {}, h('summary', { class: 'muted', style: 'font-size:var(--text-xs);cursor:pointer' }, 'Edge cases ▾ (what the guard is for)'), h('div', { class: 'row', style: 'margin-top:8px' },
       h('button', { class: 'btn btn-sm', title: 'approve_booking sent on the customer route', onclick: () => emit('approve_booking', { approved: true, revision: c?.revision || 1, start: new Date(S.play.now + 86400000).toISOString(), end: new Date(S.play.now + 90000000).toISOString(), actor: 'staff' }, 'customer') }, 'Send a forged approval'),
@@ -140,7 +140,7 @@ function viewConsole(main) {
   right.append(calendar(c, now, cfg, play));
   grid.append(right); main.append(grid);
 }
-function setStep(k) { S.step = Math.max(0, Math.min(scenario().events.length, k)); go('console', { scenario: S.scenario, mode: 'replay', step: S.step }); }
+function setStep(k) { S.step = Math.max(0, Math.min(scenario().events.length, k)); go('console', { scenario: S.scenario, mode: 'replay', step: S.step, chan: S.ui.chan === 'sms' ? null : S.ui.chan }); }
 function logList(entries, now) { return h('div', { class: 'loglist' }, entries.length ? entries.map(l => h('div', {}, h('span', {}, fmtTime(Date.parse(l.at)).slice(-5)), h('span', { class: 'muted' }, l.actor), h('span', { class: l.kind === 'guard-no' ? 'no' : l.kind === 'sim' ? 'sim' : '' }, (l.kind === 'guard-no' ? '⊘ ' : '') + l.text + (l.kind === 'sim' ? ' (Simulated)' : '')))) : h('div', { class: 'muted' }, 'no events yet — they appear as the conversation runs')); }
 function calendar(c, now, cfg, play) {
   const day = 86400000, weekStart = (() => { const d = new Date(now); const dow = (d.getUTCDay() + 6) % 7; return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()) - dow * day; })();
@@ -158,12 +158,12 @@ function calendar(c, now, cfg, play) {
 /* ---------- scenarios / config / log ---------- */
 function viewScenarios(main) {
   const res = runAllChecks(), pass = res.filter(r => r.ok).length, f = S.ui.filter;
-  main.append(h('div', { class: 'page-head' }, h('h1', {}, `Scenarios · ${SC.length}`), h('span', { class: 'muted' }, `all replayed in this tab just now → `, h('b', { class: 'mono', style: pass < SC.length ? 'color:var(--danger)' : 'color:var(--success)' }, `${pass}/${SC.length} match expected`)), h('span', { class: 'spacer' }), h('div', { class: 'filters', style: 'margin:0' }, ['all', 'pass', 'fail'].map(x => h('button', { 'aria-pressed': f === x ? 'true' : 'false', onclick: () => { S.ui.filter = x; render(); } }, x))), h('button', { class: 'btn btn-sm', onclick: () => { runAllChecks(); render(); toast('Re-ran all 22 scenarios'); } }, 'Re-run')));
+  main.append(h('div', { class: 'page-head' }, h('h1', {}, `Scenarios · ${SC.length}`), h('span', { class: 'muted' }, `all replayed in this tab just now → `, h('b', { class: 'mono', style: pass < SC.length ? 'color:var(--danger)' : 'color:var(--success)' }, `${pass}/${SC.length} match expected`)), h('span', { class: 'spacer' }), h('div', { class: 'filters', style: 'margin:0' }, ['all', 'pass', 'fail'].map(x => h('button', { 'aria-pressed': f === x ? 'true' : 'false', onclick: () => go('scenarios', { filter: x === 'all' ? null : x }) }, x))), h('button', { class: 'btn btn-sm', onclick: () => { runAllChecks(); render(); toast('Re-ran all 22 scenarios'); } }, 'Re-run')));
   const list = h('div', { class: 'scen' });
   for (const [g, names] of GROUPS) { const rows = names.map(n => { const i = SC.findIndex(s => s.name === n); return [i, res[i]]; }).filter(([, r]) => f === 'all' || (f === 'pass') === r.ok); if (!rows.length) continue; list.append(h('h2', {}, `${g} (${rows.length})`)); for (const [i, r] of rows) list.append(h('div', { class: 'row' + (r.ok ? '' : ' fail') }, h('span', { style: r.ok ? 'color:var(--success)' : 'color:var(--danger)' }, r.ok ? '✓' : '✗'), h('span', { class: 'n' }, i + 1), h('span', {}, h('b', {}, SC[i].name.replace(/_/g, ' ')), ' ', h('span', { class: 'what' }, PROVES[SC[i].name] || ''), r.ok ? null : h('div', { style: 'color:var(--danger)' }, r.problems.join('; '))), statusTag(SC[i].expected.status), h('a', { class: 'btn btn-sm', href: `#/console?scenario=${SC[i].name}&mode=replay&step=0`, onclick: () => { S.scenario = SC[i].name; S.step = 0; S.mode = 'replay'; } }, 'Open'))); }
   if (!list.children.length) main.append(h('div', { class: 'empty' }, h('h2', {}, f === 'fail' ? 'No failing scenarios' : 'No passing scenarios'),
     h('p', {}, f === 'fail' ? `All ${SC.length} scenarios match their expected outcome in this tab.` : `None of the ${SC.length} scenarios matches its expected outcome in this tab.`),
-    h('button', { class: 'btn btn-sm', onclick: () => { S.ui.filter = 'all'; render(); } }, 'Show all scenarios')));
+    h('button', { class: 'btn btn-sm', onclick: () => go('scenarios') }, 'Show all scenarios')));
   main.append(list, h('p', { class: 'muted', style: 'font-size:var(--text-xs);margin-top:12px' }, 'Expected outcomes come from scenarios.json; the "match" check also compares final status, action counts and log length with output/transcripts.json recorded by `node demo.js build`. Groups are an editorial reading of the README failure-handling table.'));
 }
 function viewConfig(main) {
@@ -182,13 +182,13 @@ function viewConfig(main) {
 }
 function viewLog(main) {
   const cur = current(), f = S.ui.logActor || 'all', rows = cur.sim.log.filter(l => f === 'all' || l.actor === f || (f === 'guard' && l.kind === 'guard-no'));
-  main.append(h('div', { class: 'page-head' }, h('h1', {}, 'Log'), h('span', { class: 'muted' }, `${S.mode === 'replay' ? 'scenario ' + S.scenario.replace(/_/g, ' ') + ' · step ' + S.step : 'play session'} · ${cur.sim.log.length} events`), h('span', { class: 'spacer' }), h('div', { class: 'filters', style: 'margin:0' }, ['all', 'customer', 'staff', 'timer', 'adapter', 'guard'].map(x => h('button', { 'aria-pressed': f === x ? 'true' : 'false', onclick: () => { S.ui.logActor = x; render(); } }, x))), h('button', { class: 'btn btn-sm', onclick: () => { const a = h('a', { href: URL.createObjectURL(new Blob([JSON.stringify({ mode: S.mode, scenario: S.scenario, events: cur.events, log: cur.sim.log, actions: cur.sim.actions, state: cur.sim.state }, null, 2)], { type: 'application/json' })), download: `desk-log-${S.mode === 'replay' ? S.scenario : 'play'}.json` }); document.body.append(a); a.click(); a.remove(); } }, 'Export JSON')));
+  main.append(h('div', { class: 'page-head' }, h('h1', {}, 'Log'), h('span', { class: 'muted' }, `${S.mode === 'replay' ? 'scenario ' + S.scenario.replace(/_/g, ' ') + ' · step ' + S.step : 'play session'} · ${cur.sim.log.length} events`), h('span', { class: 'spacer' }), h('div', { class: 'filters', style: 'margin:0' }, ['all', 'customer', 'staff', 'timer', 'adapter', 'guard'].map(x => h('button', { 'aria-pressed': f === x ? 'true' : 'false', onclick: () => go('log', { scenario: S.scenario, mode: S.mode, step: S.step, actor: x === 'all' ? null : x }) }, x))), h('button', { class: 'btn btn-sm', onclick: () => { const a = h('a', { href: URL.createObjectURL(new Blob([JSON.stringify({ mode: S.mode, scenario: S.scenario, events: cur.events, log: cur.sim.log, actions: cur.sim.actions, state: cur.sim.state }, null, 2)], { type: 'application/json' })), download: `desk-log-${S.mode === 'replay' ? S.scenario : 'play'}.json` }); document.body.append(a); a.click(); a.remove(); } }, 'Export JSON')));
   if (rows.length) { main.append(h('div', { class: 'card' }, logList(rows, cur.now))); return; }
   const filtered = cur.sim.log.length > 0;   // events exist but the actor filter hides them all
   main.append(h('div', { class: 'empty' }, h('h2', {}, filtered ? `No ${f} events` : 'No events yet'),
     h('p', {}, filtered ? `The ${f} filter hides all ${cur.sim.log.length} events of this ${S.mode === 'replay' ? 'replay step' : 'play session'}.`
       : S.mode === 'replay' ? `Step ${S.step} of this scenario has not run anything yet. Step forward in the console to replay it.` : 'Nothing has happened in this play session yet. Place a missed call in the console to start.'),
-    filtered ? h('button', { class: 'btn btn-sm', onclick: () => { S.ui.logActor = 'all'; render(); } }, 'Show all events')
+    filtered ? h('button', { class: 'btn btn-sm', onclick: () => go('log', { scenario: S.scenario, mode: S.mode, step: S.step }) }, 'Show all events')
       : h('a', { class: 'btn btn-sm', href: `#/console?scenario=${S.scenario}&mode=${S.mode}&step=${S.step}` }, 'Open the console')));
 }
 
@@ -230,13 +230,17 @@ function render() { const find = focusKey(document.activeElement); renderPage();
 function renderPage() {
   if (route().view === 'settings') { location.replace('#/config'); return; }   // old address; Settings is now the appearance dialog
   const { view, p } = route(); const main = $('#main'); main.innerHTML = '';
-  if (view === 'console') { const sc = p.get('scenario'); if (sc && SC.some(s => s.name === sc)) S.scenario = sc; const m = p.get('mode'); if (m === 'play' || m === 'replay') S.mode = m; const st = parseInt(p.get('step') || '', 10); if (!Number.isNaN(st)) S.step = Math.max(0, Math.min(scenario().events.length, st)); }
+  // the address carries the view's state, so a shared link opens the same view (v1 §9.14: tab, filter, selection, scenario)
+  if (view === 'scenarios') S.ui.filter = ['pass', 'fail'].includes(p.get('filter')) ? p.get('filter') : 'all';
+  if (view === 'log') S.ui.logActor = ['customer', 'staff', 'timer', 'adapter', 'guard'].includes(p.get('actor')) ? p.get('actor') : 'all';
+  if (view === 'console') S.ui.chan = p.get('chan') === 'whatsapp' ? 'whatsapp' : 'sms';
+  if (view === 'console' || view === 'log') { const sc = p.get('scenario'); if (sc && SC.some(s => s.name === sc)) S.scenario = sc; const m = p.get('mode'); if (m === 'play' || m === 'replay') S.mode = m; const st = parseInt(p.get('step') || '', 10); if (!Number.isNaN(st)) S.step = Math.max(0, Math.min(scenario().events.length, st)); }
   if (!S.results) runAllChecks();
   renderSubbar();
   ({ console: viewConsole, scenarios: viewScenarios, config: viewConfig, log: viewLog }[view] || viewConsole)(main);
   document.title = 'Callback Desk · ' + view[0].toUpperCase() + view.slice(1);
   const tabs = h('div', { class: 'tabs' }); main.prepend(tabs);
-  tabs.append(...[['console', 'Console'], ['scenarios', 'Scenarios'], ['config', 'Config'], ['log', 'Log']].map(([v, l]) => h('a', { href: '#/' + v + (v === 'console' ? `?scenario=${S.scenario}&mode=${S.mode}&step=${S.step}` : ''), 'aria-current': view === v ? 'page' : null }, l)));
+  tabs.append(...[['console', 'Console'], ['scenarios', 'Scenarios'], ['config', 'Config'], ['log', 'Log']].map(([v, l]) => h('a', { href: '#/' + v + (v === 'console' || v === 'log' ? `?scenario=${S.scenario}&mode=${S.mode}&step=${S.step}` : ''), 'aria-current': view === v ? 'page' : null }, l)));
 }
 // Arrow keys, Home and End move between the options of a radio group or a tab list and pick the one they land on (the WAI-ARIA
 // radio group and tabs patterns), so a focused option never hands its arrows to the step shortcuts.
