@@ -273,6 +273,9 @@ function init() {
   Appearance.bindSettings($('#nl-settings-button'));   // the gear: palette + light/dark
   $('#help').addEventListener('click', help); document.addEventListener('keydown', keys); window.addEventListener('hashchange', render);
   $('.skip').addEventListener('click', e => { e.preventDefault(); $('#main').focus(); });   // #main in the address would be read as a view
+  // the scenario bar sticks under the top bar and wraps on narrow screens: focus scrolls clear of both (family rule html{scroll-padding-top})
+  const sticky = () => root.style.setProperty('--sticky-top', ($('.topbar').offsetHeight + $('#subbar').offsetHeight) + 'px');
+  sticky(); new ResizeObserver(sticky).observe($('#subbar'));
   let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(render, 150); });
   if (!location.hash) location.replace('#/console?scenario=normal_visit&mode=replay&step=0');
   if (new URLSearchParams(location.search).get('example') === '1') { loadExample(); return; }
