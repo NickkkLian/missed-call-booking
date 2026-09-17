@@ -238,7 +238,20 @@ function renderPage() {
   const tabs = h('div', { class: 'tabs' }); main.prepend(tabs);
   tabs.append(...[['console', 'Console'], ['scenarios', 'Scenarios'], ['config', 'Config'], ['log', 'Log']].map(([v, l]) => h('a', { href: '#/' + v + (v === 'console' ? `?scenario=${S.scenario}&mode=${S.mode}&step=${S.step}` : ''), 'aria-current': view === v ? 'page' : null }, l)));
 }
-function keys(e) { if (e.target.closest('input, select, textarea, [contenteditable]') || document.querySelector('dialog[open]')) return; if (e.key === '?') { e.preventDefault(); help(); return; } if (route().view !== 'console' || S.mode !== 'replay') return; if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); setStep(S.step + 1); } if (e.key === 'ArrowLeft') { e.preventDefault(); setStep(S.step - 1); } }
+// Arrow keys, Home and End move between the options of a radio group or a tab list and pick the one they land on (the WAI-ARIA
+// radio group and tabs patterns), so a focused option never hands its arrows to the step shortcuts.
+function roving(e) {
+  const opt = e.target.closest('[role="radio"], [role="tab"]'), group = opt && opt.closest('[role="radiogroup"], [role="tablist"]');
+  if (!group || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return false;
+  const all = [...group.querySelectorAll('[role="radio"], [role="tab"]')].filter(b => !b.disabled), i = all.indexOf(opt);
+  const move = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+  const next = move ? all[(i + move + all.length) % all.length] : e.key === 'Home' ? all[0] : e.key === 'End' ? all[all.length - 1] : null;
+  if (!next) return false;
+  e.preventDefault(); next.focus(); if (next !== opt) next.click(); return true;
+}
+function keys(e) { if (e.target.closest('input, select, textarea, [contenteditable]') || document.querySelector('dialog[open]')) return;
+  if ((e.key === ' ' || e.key === 'Enter') && e.target.closest('button, a[href], summary, [role="button"], [role="radio"], [role="tab"]')) return;
+  if (roving(e)) return; if (e.key === '?') { e.preventDefault(); help(); return; } if (route().view !== 'console' || S.mode !== 'replay') return; if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); setStep(S.step + 1); } if (e.key === 'ArrowLeft') { e.preventDefault(); setStep(S.step - 1); } }
 function init() {
   const root = document.documentElement, tb = $('#theme');
   Appearance.bindToggle(tb);   // ◐ switches light/dark only (appearance.js)
