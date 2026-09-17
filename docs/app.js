@@ -272,6 +272,7 @@ function init() {
   Appearance.bindToggle(tb);   // ◐ switches light/dark only (appearance.js)
   Appearance.bindSettings($('#nl-settings-button'));   // the gear: palette + light/dark
   $('#help').addEventListener('click', help); document.addEventListener('keydown', keys); window.addEventListener('hashchange', render);
+  $('.skip').addEventListener('click', e => { e.preventDefault(); $('#main').focus(); });   // #main in the address would be read as a view
   let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(render, 150); });
   if (!location.hash) location.replace('#/console?scenario=normal_visit&mode=replay&step=0');
   if (new URLSearchParams(location.search).get('example') === '1') { loadExample(); return; }
