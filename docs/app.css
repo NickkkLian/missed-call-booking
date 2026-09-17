@@ -350,10 +350,14 @@ dialog table{font-size:var(--text-sm)}dialog td{padding:2px var(--space-3) 2px 0
 .config .ro{background:var(--surface-2);border-color:var(--border)}
 .savebar{position:sticky;bottom:var(--space-4);display:flex;justify-content:flex-end;gap:var(--space-2);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-3);box-shadow:var(--shadow-2)}
 @media (max-width:1199px){.console{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.console .col-cal{grid-column:1 / -1}}
-@media (max-width:899px){.console{grid-template-columns:minmax(0,1fr)}.console .col{display:none}.console .col.active{display:block}.mtabs{display:flex}.phone{max-width:none}}
-.mtabs{display:none;gap:2px;margin-bottom:var(--space-3);background:var(--surface-2);border-radius:var(--radius-sm);padding:2px}
+@media (max-width:899px){.console{grid-template-columns:minmax(0,1fr)}.console .col{display:none}.console .col.active{display:block}.phone{max-width:none}}
+.mtabs{display:none;gap:2px;margin-bottom:var(--space-3);background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:2px}   /* sunken like .seg, so it takes the same 1px line */
 .mtabs button{flex:1;height:32px;border:0;border-radius:3px;background:transparent;font-size:var(--text-xs);cursor:pointer;color:var(--text-2)}
 .mtabs button[aria-selected="true"]{background:var(--paper);color:var(--text);box-shadow:var(--shadow-1),inset 0 0 0 1px var(--border-input)}
+/* the tabs show only when the columns stack; this rule has to come after the base .mtabs rule, or the tabs stay hidden and the
+   staff desk and calendar columns cannot be reached on a phone (the case from the first commit until 2026-09-16) */
+@media (max-width:899px){.mtabs{display:flex}}
+@media (pointer:coarse){.mtabs button{height:var(--touch-min)}}
 /* ===== Family layer v3.1: band surfaces, pressed and focus states, touch targets =====
    The band (top bar, signature panel, footer) is the anchor surface: deep in Plaster and Ink, a whiter paper in
    Paper. Everything on it uses the --on-band pair; focus rings and text selection get their own colours there
