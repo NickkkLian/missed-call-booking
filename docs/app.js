@@ -84,6 +84,7 @@ function loadExample() { resetPlay(); const evs = JSON.parse(JSON.stringify(SC[0
 function resetPlay() { S.play = { events: [], now: Date.UTC(2025, 8, 15, 9, 41), seq: 0 }; S.ui.calSel = null; }
 function viewConsole(main) {
   const cur = current(), sim = cur.sim, c = contact(sim), now = cur.now, cfg = cur.config, play = S.mode === 'play';
+  let stepperBar = null;
   main.append(h('h1', { class: 'sr-only' }, 'Console'));
   main.append(h('div', { class: 'mtabs', role: 'tablist' }, [['customer', 'Customer'], ['staff', 'Staff desk'], ['calendar', 'Calendar & state']].map(([k, l]) => h('button', { role: 'tab', 'aria-selected': S.ui.mtab === k ? 'true' : 'false', onclick: () => { S.ui.mtab = k; render(); } }, l))));
   const grid = h('div', { class: 'console' });
@@ -105,7 +106,15 @@ function viewConsole(main) {
       h('button', { class: 'btn btn-sm', title: 'approve_booking sent on the customer route', onclick: () => emit('approve_booking', { approved: true, revision: c?.revision || 1, start: new Date(S.play.now + 86400000).toISOString(), end: new Date(S.play.now + 90000000).toISOString(), actor: 'staff' }, 'customer') }, 'Send a forged approval'),
       h('button', { class: 'btn btn-sm', title: 'resend the last staff event with the same id', onclick: () => { const last = [...S.play.events].reverse().find(e => e.channel === 'staff'); if (!last) return toast('No staff event to replay yet'); S.play.events.push(JSON.parse(JSON.stringify(last))); render(); } }, 'Replay last staff approval'),
       h('button', { class: 'btn btn-sm', title: 'STOP with a timestamp older than the last event', onclick: () => emit('message', { text: 'STOP' }, 'customer', new Date(Date.UTC(2025, 8, 15, 9, 0)).toISOString()) }, 'STOP with an old timestamp')))));
-  else { const all = cur.all; phone.append(h('div', { class: 'stepper' }, h('button', { class: 'btn btn-sm', disabled: S.step <= 0, onclick: () => setStep(S.step - 1) }, '◀ Prev'), h('span', { class: 'pos' }, `step ${S.step} / ${all.length}`), h('button', { class: 'btn btn-sm btn-primary', disabled: S.step >= all.length, onclick: () => setStep(S.step + 1) }, 'Next ▶'),
+  // Below 900px the columns become tabs, so the replay controls leave the phone and sit in one bar pinned to the bottom of the
+  // screen, reachable from every tab (ruling 2026-09-16 20:11 Q15); the "next: …" line stays with the phone. One set of
+  // controls is rendered either way: render() runs again when the window crosses the breakpoint.
+  else { const all = cur.all, narrow = matchMedia('(max-width:899px)').matches;
+    // data-key keeps focus on Prev or Next after the re-render (the kind-and-position fallback picked another primary button
+    // once a draft card appeared, and focus left the bar)
+    const controls = () => [h('button', { class: 'btn btn-sm', 'data-key': 'prev', disabled: S.step <= 0, onclick: () => setStep(S.step - 1) }, '◀ Prev'), h('span', { class: 'pos' }, `step ${S.step} / ${all.length}`), h('button', { class: 'btn btn-sm btn-primary', 'data-key': 'next', disabled: S.step >= all.length, onclick: () => setStep(S.step + 1) }, 'Next ▶')];
+    if (narrow) stepperBar = h('div', { class: 'stepper stepper-bar', role: 'group', 'aria-label': 'Replay steps' }, controls());
+    phone.append(h('div', { class: 'stepper' }, narrow ? null : controls(),
     h('span', { class: 'say' }, S.step < all.length ? 'next: ' + say(all[S.step]) : (() => { const r = S.results[SC.indexOf(scenario())]; return `end · expected: ${scenario().expected.status} · actual: ${c?.status || '—'} ${r.ok ? '✓' : '✗ ' + r.problems.join('; ')}`; })()))); }
   grid.append(h('section', { class: 'col col-customer' + (S.ui.mtab === 'customer' ? ' active' : '') }, h('h2', {}, 'Customer', h('span', { class: 'you' }, play ? 'you are: customer' : 'replay')), phone));
   // ── staff column
@@ -140,6 +149,7 @@ function viewConsole(main) {
     h('div', { style: 'margin-top:8px' }, h('div', { class: 'muted', style: 'font-size:var(--text-2xs);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px' }, 'Last guard decision'), lastNo && (!lastGuard || lastNo.i >= lastGuard.i) ? h('div', { class: 'guardline no' }, '⊘ ' + lastNo.text) : lastGuard ? h('div', { class: 'guardline' }, '✓ ' + lastGuard.text) : h('div', { class: 'guardline' }, 'no guarded action yet'))));
   right.append(calendar(c, now, cfg, play));
   grid.append(right); main.append(grid);
+  if (stepperBar) main.append(stepperBar);
 }
 function setStep(k) { S.step = Math.max(0, Math.min(scenario().events.length, k)); go('console', { scenario: S.scenario, mode: 'replay', step: S.step, chan: S.ui.chan === 'sms' ? null : S.ui.chan }); }
 function logList(entries, now) { return h('div', { class: 'loglist' }, entries.length ? entries.map(l => h('div', {}, h('span', {}, fmtTime(Date.parse(l.at)).slice(-5)), h('span', { class: 'muted' }, l.actor), h('span', { class: l.kind === 'guard-no' ? 'no' : l.kind === 'sim' ? 'sim' : '' }, (l.kind === 'guard-no' ? '⊘ ' : '') + l.text + (l.kind === 'sim' ? ' (Simulated)' : '')))) : h('p', { class: 'muted', style: 'margin:0' }, 'no events yet — they appear as the conversation runs')); }
@@ -284,8 +294,10 @@ function init() {
   $('#help').addEventListener('click', help); document.addEventListener('keydown', keys); window.addEventListener('hashchange', render);
   $('.skip').addEventListener('click', e => { e.preventDefault(); firstHeading().focus(); });   // #main in the address would be read as a view
   // the scenario bar sticks under the top bar and wraps on narrow screens: focus scrolls clear of both (family rule html{scroll-padding-top})
-  const sticky = () => root.style.setProperty('--sticky-top', ($('.topbar').offsetHeight + $('#subbar').offsetHeight) + 'px');
-  sticky(); new ResizeObserver(sticky).observe($('#subbar'));
+  const sticky = () => { const sub = $('#subbar'), bar = $('.stepper-bar');
+    root.style.setProperty('--sticky-top', ($('.topbar').offsetHeight + (getComputedStyle(sub).position === 'sticky' ? sub.offsetHeight : 0)) + 'px');
+    root.style.setProperty('--sticky-bottom', (bar ? bar.offsetHeight : 0) + 'px'); };
+  sticky(); new ResizeObserver(sticky).observe($('#subbar')); new MutationObserver(sticky).observe($('#main'), { childList: true }); window.addEventListener('resize', sticky);
   let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(render, 150); });
   if (!location.hash) location.replace('#/console?scenario=normal_visit&mode=replay&step=0');
   if (new URLSearchParams(location.search).get('example') === '1') { loadExample(); return; }

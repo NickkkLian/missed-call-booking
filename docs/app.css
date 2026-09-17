@@ -306,6 +306,11 @@ dialog table{font-size:var(--text-sm)}dialog td{padding:2px var(--space-3) 2px 0
 .stepper{display:flex;align-items:center;gap:var(--space-2);padding:var(--space-3);border-top:1px solid var(--border);font-size:var(--text-xs);color:var(--text-2);flex-wrap:wrap}
 .stepper .pos{font-family:var(--font-mono);white-space:nowrap}
 .stepper .say{flex-basis:100%}
+/* narrow screens: the replay controls in one bar pinned to the bottom, reachable from every column tab (ruling 2026-09-16 20:11 Q15) */
+.stepper-bar{position:sticky;bottom:0;z-index:var(--z-sticky);justify-content:space-between;margin-top:var(--space-3);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md) var(--radius-md) 0 0;padding-bottom:calc(var(--space-3) + env(safe-area-inset-bottom));box-shadow:var(--shadow-1)}
+.stepper:not(.stepper-bar):empty{display:none}
+html{scroll-padding-bottom:var(--sticky-bottom,0px)}
+@media (max-width:767px){.subbar{position:static}}   /* only the top bar stays pinned on a phone: the scenario bar was 147–207px tall */
 .qcard{border:1px solid var(--border);border-radius:var(--radius-md);background:var(--paper);padding:var(--space-3) var(--space-4);display:grid;gap:var(--space-2);margin-bottom:var(--space-2);box-shadow:var(--shadow-1)}
 .qcard.await{border-left:3px solid var(--accent-text)}
 .qcard.blocked{border-color:var(--danger)}
