@@ -165,7 +165,7 @@ function viewScenarios(main) {
   if (!list.children.length) main.append(h('div', { class: 'empty' }, h('h2', {}, f === 'fail' ? 'No failing scenarios' : 'No passing scenarios'),
     h('p', {}, f === 'fail' ? `All ${SC.length} scenarios match their expected outcome in this tab.` : `None of the ${SC.length} scenarios matches its expected outcome in this tab.`),
     h('button', { class: 'btn btn-sm', onclick: () => go('scenarios') }, 'Show all scenarios')));
-  main.append(list, h('p', { class: 'muted', style: 'font-size:var(--text-xs);margin-top:12px' }, 'Expected outcomes come from scenarios.json; the "match" check also compares final status, action counts and log length with output/transcripts.json recorded by `node demo.js build`. Groups are an editorial reading of the README failure-handling table.'));
+  main.append(list, h('p', { class: 'muted', style: 'font-size:var(--text-xs);margin-top:12px;max-width:var(--measure)' }, 'Expected outcomes come from scenarios.json; the "match" check also compares final status, action counts and log length with output/transcripts.json recorded by `node demo.js build`. Groups are an editorial reading of the README failure-handling table.'));
 }
 function configErrors(p) { const errs = [];
   if (!(p.reminderMinutes < p.stopMinutes)) errs.push('reminder must be less than stop'); for (const k of ['duplicateMinutes', 'reminderMinutes', 'stopMinutes', 'escalateMinutes']) if (!(p[k] > 0)) errs.push(k + ' must be > 0'); if (!(p.openHour < p.closeHour)) errs.push('open must be before close');
