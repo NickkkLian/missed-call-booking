@@ -230,12 +230,20 @@ function focusKey(el) {
   find.caret = typeof el.selectionStart === 'number' ? [el.selectionStart, el.selectionEnd] : null;   // a text field keeps its caret
   return find;
 }
+// Where focus goes when there is no control to go back to, and where the skip link sends it: the first visible h1 in main,
+// else the first visible h2, else main itself (ruling 2026-09-16 20:11 Q16). The console's h1 is visually hidden, so it
+// lands on the Customer column's heading.
+function firstHeading() {
+  const seen = x => { const r = x.getBoundingClientRect(), cs = getComputedStyle(x); return r.width > 2 && r.height > 2 && cs.visibility !== 'hidden' && !/inset\(50%\)|rect\(0/.test(cs.clipPath + cs.clip); };
+  const x = [...document.querySelectorAll('main h1')].find(seen) || [...document.querySelectorAll('main h2')].find(seen) || $('#main');
+  if (x && !x.hasAttribute('tabindex')) x.setAttribute('tabindex', '-1');
+  return x;
+}
 function restoreFocus(find) {
   if (!find || (document.activeElement && document.activeElement !== document.body)) return;
   let el = find();
-  const heading = () => { for (const sel of ['main h1', 'main h2', 'main']) { const x = [...document.querySelectorAll(sel)].find(y => { const r = y.getBoundingClientRect(); return r.width > 2 && r.height > 2; }); if (x) { if (!x.hasAttribute('tabindex')) x.setAttribute('tabindex', '-1'); return x; } } return null; };
-  if (!el || !el.getClientRects().length) el = heading();
-  if (el) { el.focus(); if (document.activeElement !== el && (el = heading())) el.focus(); }   // a disabled control does not take focus
+  if (!el || !el.getClientRects().length) el = firstHeading();
+  if (el) { el.focus(); if (document.activeElement !== el && (el = firstHeading())) el.focus(); }   // a disabled control does not take focus
   if (el && find.caret && el.setSelectionRange) try { el.setSelectionRange(find.caret[0], find.caret[1]); } catch (e) { /* not a text field */ }
 }
 function render() { const find = focusKey(document.activeElement); renderPage(); restoreFocus(find); }
@@ -274,7 +282,7 @@ function init() {
   Appearance.bindToggle(tb);   // ◐ switches light/dark only (appearance.js)
   Appearance.bindSettings($('#nl-settings-button'), { shortcuts: '? opens help; Space and the arrow keys step through a replay. Turn them off if you use voice control. On by default.' });   // the gear: palette, light/dark, single-key shortcuts
   $('#help').addEventListener('click', help); document.addEventListener('keydown', keys); window.addEventListener('hashchange', render);
-  $('.skip').addEventListener('click', e => { e.preventDefault(); $('#main').focus(); });   // #main in the address would be read as a view
+  $('.skip').addEventListener('click', e => { e.preventDefault(); firstHeading().focus(); });   // #main in the address would be read as a view
   // the scenario bar sticks under the top bar and wraps on narrow screens: focus scrolls clear of both (family rule html{scroll-padding-top})
   const sticky = () => root.style.setProperty('--sticky-top', ($('.topbar').offsetHeight + $('#subbar').offsetHeight) + 'px');
   sticky(); new ResizeObserver(sticky).observe($('#subbar'));
