@@ -77,6 +77,7 @@ function renderSubbar() {
   const pass = S.results.filter(r => r.ok).length;
   bar.append(...[h('span', { class: 'muted', style: 'font-size:var(--text-xs)' }, 'Scenario'), sel, seg, h('span', { class: 'clock' }, '⏱ ' + fmtTime(current().now) + ' ' + tz()),
     S.mode === 'play' ? h('span', { class: 'row', style: 'gap:4px' }, [5, 30, 45, 90].map(m => h('button', { class: 'btn btn-sm', onclick: () => advance(m) }, `+${m}m`))) : null,
+    S.mode === 'play' ? h('span', { class: 'muted', style: 'font-size:var(--text-xs)' }, 'Play conversations are not saved') : null,
     h('span', { class: 'spacer' }), h('a', { class: 'btn btn-ghost btn-sm', href: '#/scenarios', style: pass < SC.length ? 'color:var(--danger)' : '' }, `${pass}/${SC.length} scenarios pass in this tab`)].filter(Boolean));
 }
 function loadExample() { resetPlay(); const evs = JSON.parse(JSON.stringify(SC[0].events)); S.play.events = evs; S.play.seq = evs.length; S.play.now = Date.parse(evs[evs.length - 1].body.at) + 60000; S.play.events.push({ channel: 'customer', body: { id: 'forged-' + (++S.play.seq), at: new Date(S.play.now).toISOString(), phone: PHONE, type: 'approve_booking', approved: true, revision: 1, start: '2025-09-17T10:00:00Z', end: '2025-09-17T11:00:00Z', actor: 'staff' } }); S.mode = 'play'; go('console', { scenario: S.scenario, mode: 'play', step: S.step }); render(); }
@@ -141,7 +142,7 @@ function viewConsole(main) {
   grid.append(right); main.append(grid);
 }
 function setStep(k) { S.step = Math.max(0, Math.min(scenario().events.length, k)); go('console', { scenario: S.scenario, mode: 'replay', step: S.step, chan: S.ui.chan === 'sms' ? null : S.ui.chan }); }
-function logList(entries, now) { return h('div', { class: 'loglist' }, entries.length ? entries.map(l => h('div', {}, h('span', {}, fmtTime(Date.parse(l.at)).slice(-5)), h('span', { class: 'muted' }, l.actor), h('span', { class: l.kind === 'guard-no' ? 'no' : l.kind === 'sim' ? 'sim' : '' }, (l.kind === 'guard-no' ? '⊘ ' : '') + l.text + (l.kind === 'sim' ? ' (Simulated)' : '')))) : h('div', { class: 'muted' }, 'no events yet — they appear as the conversation runs')); }
+function logList(entries, now) { return h('div', { class: 'loglist' }, entries.length ? entries.map(l => h('div', {}, h('span', {}, fmtTime(Date.parse(l.at)).slice(-5)), h('span', { class: 'muted' }, l.actor), h('span', { class: l.kind === 'guard-no' ? 'no' : l.kind === 'sim' ? 'sim' : '' }, (l.kind === 'guard-no' ? '⊘ ' : '') + l.text + (l.kind === 'sim' ? ' (Simulated)' : '')))) : h('p', { class: 'muted', style: 'margin:0' }, 'no events yet — they appear as the conversation runs')); }
 function calendar(c, now, cfg, play) {
   const day = 86400000, weekStart = (() => { const d = new Date(now); const dow = (d.getUTCDay() + 6) % 7; return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()) - dow * day; })();
   const days = [...Array(7)].map((_, i) => weekStart + i * day), hours = []; for (let hh = Math.max(0, cfg.openHour - 1); hh < Math.min(24, cfg.closeHour + 1); hh++) hours.push(hh);
