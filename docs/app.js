@@ -192,10 +192,19 @@ function help() { dialog('Keyboard shortcuts', h('table', {}, [['→ / Space', '
 function focusKey(el) {
   if (!el || el === document.body || el === document.documentElement) return null;
   const scope = el.parentElement && el.parentElement.closest('[id]'), within = scope ? '#' + CSS.escape(scope.id) + ' ' : '', tag = el.tagName.toLowerCase();
-  const tries = ['id', 'data-id', 'data-key', 'data-sort', 'href', 'name'].filter(a => el.getAttribute(a)).map(a => within + tag + '[' + a + '="' + el.getAttribute(a).replace(/["\\]/g, '\\$&') + '"]');
-  const kind = within + tag + (typeof el.className === 'string' && el.className.trim() ? '.' + el.className.trim().split(/\s+/).map(c => CSS.escape(c)).join('.') : '');
-  const index = [...document.querySelectorAll(kind)].indexOf(el);
-  const find = () => { for (const s of tries) { const x = document.querySelector(s); if (x) return x; } return index < 0 ? null : document.querySelectorAll(kind)[index] || null; };
+  const quote = v => '"' + v.replace(/["\\]/g, '\\$&') + '"';
+  const tries = ['id', 'data-id', 'data-key', 'data-sort', 'href', 'name'].filter(a => el.getAttribute(a)).map(a => within + tag + '[' + a + '=' + quote(el.getAttribute(a)) + ']');
+  const kind = tag + (typeof el.className === 'string' && el.className.trim() ? '.' + el.className.trim().split(/\s+/).map(c => CSS.escape(c)).join('.') : '');
+  // a control inside a record (an element with data-id, such as a table row) is looked for in that same record first, then in
+  // the record now at its place in the list (the next one moved up), and only then does focus go to the heading
+  const rec = el.parentElement && el.parentElement.closest('[data-id]'), recs = rec ? within + rec.tagName.toLowerCase() + '[data-id]' : null;
+  const recId = rec && rec.getAttribute('data-id'), recAt = rec ? [...document.querySelectorAll(recs)].indexOf(rec) : -1, inRec = rec ? [...rec.querySelectorAll(kind)].indexOf(el) : -1;
+  const index = [...document.querySelectorAll(within + kind)].indexOf(el);
+  const find = () => {
+    for (const s of tries) { const x = document.querySelector(s); if (x) return x; }
+    if (rec) { const r = document.querySelector(within + rec.tagName.toLowerCase() + '[data-id=' + quote(recId) + ']') || document.querySelectorAll(recs)[recAt]; return r ? r.querySelectorAll(kind)[inRec] || null : null; }
+    return index < 0 ? null : document.querySelectorAll(within + kind)[index] || null;
+  };
   find.caret = typeof el.selectionStart === 'number' ? [el.selectionStart, el.selectionEnd] : null;   // a text field keeps its caret
   return find;
 }
