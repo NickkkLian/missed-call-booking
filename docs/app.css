@@ -1,4 +1,4 @@
-/* app.css — Bill Bench. Consumes only semantic tokens from design-tokens.css (02 §8). Base + family components (from assets/example.html) + workbench layout. */
+/* app.css — Callback Desk. Consumes only semantic tokens from design-tokens.css. Base + family components + simulator layout. */
 /* ===== Fallback faces: until the web fonts load (or if they never do), system fonts are scaled to the measured widths so line lengths and column widths do not jump ===== */
 @font-face{font-family:"Fraunces Fallback";src:local("Georgia"),local("Times New Roman");size-adjust:93.3%}
 @font-face{font-family:"Inter Fallback";src:local("Helvetica Neue"),local("Arial"),local("Segoe UI");size-adjust:106.5%}

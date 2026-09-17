@@ -12,7 +12,7 @@ A missed call creates an SMS draft that points the customer to WhatsApp intake. 
 
 ## Try it
 
-**In the browser** — open the [live simulator](https://nickkklian.github.io/missed-call-booking/) (static, no server, no network requests) or `docs/index.html` from a clone. *Replay* steps through any of the 22 scenarios one event at a time; *Play as customer & staff* lets you call, text, send the intake form, approve drafts, pick a calendar slot, simulate the adapter receipt, advance the clock, and try the three attacks the guard exists for (a forged approval on the customer route, a replayed approval, a STOP with an old timestamp). The scenarios page replays all 22 in your tab and shows whether each matches its expected outcome.
+**In the browser** — open the [live simulator](https://nickkklian.github.io/missed-call-booking/) (static, no server; the only network requests are its web fonts) or `docs/index.html` from a clone. *Replay* steps through any of the 22 scenarios one event at a time; *Play as customer & staff* lets you call, text, send the intake form, approve drafts, pick a calendar slot, simulate the adapter receipt, advance the clock, and try the three attacks the guard exists for (a forged approval on the customer route, a replayed approval, a STOP with an old timestamp). The scenarios page replays all 22 in your tab and shows whether each matches its expected outcome.
 
 **From the command line** — tested with Node.js 24 on macOS; CI runs Node 22 on Ubuntu, Windows and macOS. No packages, services, credentials or internet connection are needed.
 

@@ -1,5 +1,5 @@
 /* app.js — Callback Desk UI. The state machine is engine.js (the same file the n8n export embeds); replay/play both go
-   through sim.js. This file only turns events into views. No network requests at all. */
+   through sim.js. This file only turns events into views. No network requests apart from the web fonts. */
 (() => {
 'use strict';
 const SC = window.DESK_SCENARIOS, DEFAULT_CONFIG = window.DESK_CONFIG, EXPECTED = window.DESK_EXPECTED, SIM = window.DeskSim;
