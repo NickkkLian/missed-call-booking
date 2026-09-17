@@ -205,7 +205,8 @@ function viewLog(main) {
 }
 
 /* ---------- render / keys / init ---------- */
-function help() { dialog('Keyboard shortcuts', h('table', {}, [['→ / Space', 'next step (replay)'], ['←', 'previous step'], ['?', 'this help'], ['Esc', 'close']].map(([k, v]) => h('tr', {}, h('td', {}, h('kbd', {}, k)), h('td', { class: 'muted' }, v)))), { ok: 'Close', cancel: null }); }
+function help() { dialog('Keyboard shortcuts', h('div', {}, Appearance.shortcutsOn() ? null : h('p', { style: 'margin-bottom:12px' }, 'Single-key shortcuts are off — turn them on in Settings.'),
+  h('table', {}, [['→ / Space', 'next step (replay)'], ['←', 'previous step'], ['?', 'this help'], ['Esc', 'close']].map(([k, v]) => h('tr', {}, h('td', {}, h('kbd', {}, k)), h('td', { class: 'muted' }, v))))), { ok: 'Close', cancel: null }); }
 // Every render replaces the page's elements, so the control a keyboard user was on disappears and focus drops to <body>:
 // no focus ring, and Tab starts again from the top of the page (found 2026-09-16 with real key presses). The wrapper puts
 // focus back on the same control (same attribute, or the same kind of control at the same position) or, when that control
@@ -266,11 +267,12 @@ function roving(e) {
 }
 function keys(e) { if (e.target.closest('input, select, textarea, [contenteditable]') || document.querySelector('dialog[open]')) return;
   if ((e.key === ' ' || e.key === 'Enter') && e.target.closest('button, a[href], summary, [role="button"], [role="radio"], [role="tab"]')) return;
-  if (roving(e)) return; if (e.key === '?') { e.preventDefault(); help(); return; } if (route().view !== 'console' || S.mode !== 'replay') return; if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); setStep(S.step + 1); } if (e.key === 'ArrowLeft') { e.preventDefault(); setStep(S.step - 1); } }
+  if (roving(e)) return; if (!Appearance.shortcutsOn()) return;   // the Settings switch turns off every page-level single key (? , Space and the arrows)
+  if (e.key === '?') { e.preventDefault(); help(); return; } if (route().view !== 'console' || S.mode !== 'replay') return; if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); setStep(S.step + 1); } if (e.key === 'ArrowLeft') { e.preventDefault(); setStep(S.step - 1); } }
 function init() {
   const root = document.documentElement, tb = $('#theme');
   Appearance.bindToggle(tb);   // ◐ switches light/dark only (appearance.js)
-  Appearance.bindSettings($('#nl-settings-button'));   // the gear: palette + light/dark
+  Appearance.bindSettings($('#nl-settings-button'), { shortcuts: '? opens help; Space and the arrow keys step through a replay. Turn them off if you use voice control. On by default.' });   // the gear: palette, light/dark, single-key shortcuts
   $('#help').addEventListener('click', help); document.addEventListener('keydown', keys); window.addEventListener('hashchange', render);
   $('.skip').addEventListener('click', e => { e.preventDefault(); $('#main').focus(); });   // #main in the address would be read as a view
   // the scenario bar sticks under the top bar and wraps on narrow screens: focus scrolls clear of both (family rule html{scroll-padding-top})
