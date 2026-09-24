@@ -1,5 +1,7 @@
 # Callback Desk
 
+![Callback Desk](.github/header.png)
+
 **Turn missed calls into bookings — staff approve every message and every calendar write.**
 
 A missed call creates an SMS draft that points the customer to WhatsApp intake. Structured details become a booking request. Staff approve the current request before a calendar action can run, and only an authenticated success receipt produces a confirmation draft — which staff approve again. Nothing goes out on its own.
