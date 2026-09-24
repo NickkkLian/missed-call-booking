@@ -6,7 +6,7 @@ A missed call creates an SMS draft that points the customer to WhatsApp intake. 
 
 > **This is an offline n8n template with fictional customer records, plus a browser simulator that runs the same state machine.** It has not been imported into a running n8n instance. Provider integrations are adapter placeholders. It is not a deployed customer service.
 
-[![Check](https://github.com/NickkkLian/missed-call-booking/actions/workflows/check.yml/badge.svg)](https://github.com/NickkkLian/missed-call-booking/actions/workflows/check.yml)
+[![Check](https://img.shields.io/github/actions/workflow/status/NickkkLian/missed-call-booking/check.yml?branch=main&label=check&style=flat-square&labelColor=2f5859)](https://github.com/NickkkLian/missed-call-booking/actions/workflows/check.yml)
 
 ![Callback Desk console: the customer's phone, the staff desk with a draft awaiting approval, and the state card with the last guard decision](docs/screenshot-console.png)
 
@@ -24,6 +24,7 @@ node demo.js check
 The build prints every conversation and final state. [scenarios.json](scenarios.json) contains the events and explicit expected outcomes. [output/transcripts.json](output/transcripts.json) preserves the full replay. Expected check result: `CHECK PASS 22/22 scenarios`.
 
 ```mermaid
+%%{init: {"theme": "base", "themeVariables": {"darkMode": false, "fontFamily": "Inter, BlinkMacSystemFont, Segoe UI, Helvetica Neue, Helvetica, Arial", "primaryColor": "#dae7db", "mainBkg": "#dae7db", "primaryTextColor": "#1d1b24", "nodeTextColor": "#1d1b24", "textColor": "#1d1b24", "primaryBorderColor": "#2f5859", "nodeBorder": "#2f5859", "secondaryColor": "#fae8eb", "tertiaryColor": "#f7e9e8", "lineColor": "#5f7f76", "arrowheadColor": "#5f7f76", "defaultLinkColor": "#5f7f76", "edgeLabelBackground": "#fae8eb", "clusterBkg": "#f7e9e8", "clusterBorder": "#a8707a", "titleColor": "#7d2d44"}}}%%
 flowchart TD
     Call[Missed call] --> Dedupe[Check duplicate and STOP state]
     Dedupe --> Draft[SMS draft with WhatsApp link]
