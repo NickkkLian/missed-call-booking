@@ -107,7 +107,7 @@ function viewConsole(main) {
       h('button', { class: 'btn btn-sm', title: 'resend the last staff event with the same id', onclick: () => { const last = [...S.play.events].reverse().find(e => e.channel === 'staff'); if (!last) return toast('No staff event to replay yet'); S.play.events.push(JSON.parse(JSON.stringify(last))); render(); } }, 'Replay last staff approval'),
       h('button', { class: 'btn btn-sm', title: 'STOP with a timestamp older than the last event', onclick: () => emit('message', { text: 'STOP' }, 'customer', new Date(Date.UTC(2025, 8, 15, 9, 0)).toISOString()) }, 'STOP with an old timestamp')))));
   // Below 900px the columns become tabs, so the replay controls leave the phone and sit in one bar pinned to the bottom of the
-  // screen, reachable from every tab (ruling 2026-09-16 20:11 Q15); the "next: …" line stays with the phone. One set of
+  // screen, reachable from every tab; the "next: …" line stays with the phone. One set of
   // controls is rendered either way: render() runs again when the window crosses the breakpoint.
   else { const all = cur.all, narrow = matchMedia('(max-width:899px)').matches;
     // data-key keeps focus on Prev or Next after the re-render (the kind-and-position fallback picked another primary button
@@ -241,7 +241,7 @@ function focusKey(el) {
   return find;
 }
 // Where focus goes when there is no control to go back to, and where the skip link sends it: the first visible h1 in main,
-// else the first visible h2, else main itself (ruling 2026-09-16 20:11 Q16). The console's h1 is visually hidden, so it
+// else the first visible h2, else main itself. The console's h1 is visually hidden, so it
 // lands on the Customer column's heading.
 function firstHeading() {
   const seen = x => { const r = x.getBoundingClientRect(), cs = getComputedStyle(x); return r.width > 2 && r.height > 2 && cs.visibility !== 'hidden' && !/inset\(50%\)|rect\(0/.test(cs.clipPath + cs.clip); };
@@ -260,7 +260,7 @@ function render() { const find = focusKey(document.activeElement); renderPage();
 function renderPage() {
   if (route().view === 'settings') { location.replace('#/config'); return; }   // old address; Settings is now the appearance dialog
   const { view, p } = route(); const main = $('#main'); main.innerHTML = '';
-  // the address carries the view's state, so a shared link opens the same view (v1 §9.14: tab, filter, selection, scenario)
+  // the address carries the view's state, so a shared link opens the same view (tab, filter, selection, scenario)
   if (view === 'scenarios') S.ui.filter = ['pass', 'fail'].includes(p.get('filter')) ? p.get('filter') : 'all';
   if (view === 'log') S.ui.logActor = ['customer', 'staff', 'timer', 'adapter', 'guard'].includes(p.get('actor')) ? p.get('actor') : 'all';
   if (view === 'console') S.ui.chan = p.get('chan') === 'whatsapp' ? 'whatsapp' : 'sms';

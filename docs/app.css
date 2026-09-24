@@ -306,7 +306,7 @@ dialog table{font-size:var(--text-sm)}dialog td{padding:2px var(--space-3) 2px 0
 .stepper{display:flex;align-items:center;gap:var(--space-2);padding:var(--space-3);border-top:1px solid var(--border);font-size:var(--text-xs);color:var(--text-2);flex-wrap:wrap}
 .stepper .pos{font-family:var(--font-mono);white-space:nowrap}
 .stepper .say{flex-basis:100%}
-/* narrow screens: the replay controls in one bar pinned to the bottom, reachable from every column tab (ruling 2026-09-16 20:11 Q15) */
+/* narrow screens: the replay controls in one bar pinned to the bottom, reachable from every column tab */
 .stepper-bar{position:sticky;bottom:0;z-index:var(--z-sticky);justify-content:space-between;margin-top:var(--space-3);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md) var(--radius-md) 0 0;padding-bottom:calc(var(--space-3) + env(safe-area-inset-bottom));box-shadow:var(--shadow-1)}
 .stepper:not(.stepper-bar):empty{display:none}
 html{scroll-padding-bottom:var(--sticky-bottom,0px)}
@@ -380,10 +380,10 @@ html{scroll-padding-bottom:var(--sticky-bottom,0px)}
 }
 .topbar :focus-visible,.plate :focus-visible,.honest :focus-visible{outline-color:var(--on-band)}
 /* Focus scrolls clear of the sticky top bar: a control reached by Tab, or <main> after the skip link, never lands under
-   the bar (round-1 audits, 2026-09-16: the ring of <main> and most of a button sat behind it). A product whose sticky
+   the bar (2026-09-16: the ring of <main> and most of a button sat behind it). A product whose sticky
    chrome is taller than the bar, or wraps, sets --sticky-top to its measured height. */
 html{scroll-padding-top:calc(var(--sticky-top,var(--topbar-h)) + var(--space-3))}
-/* Native checkboxes and radios take the palette's accent instead of the browser's blue (ruling 2026-09-16 20:11 Q4:
+/* Native checkboxes and radios take the palette's accent instead of the browser's blue (contrast:
    checked fill against its surface 4.55–16.17:1, tick against the fill 4.71–16.34:1 across the three palettes, light and dark). */
 :root{accent-color:var(--accent)}
 .topbar ::selection,.plate ::selection,.honest ::selection{background:var(--on-band-2);color:var(--band)}
