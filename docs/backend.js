@@ -31,9 +31,11 @@ function mount(doc, fetchImpl) {
   const pill = doc.createElement('span');
   pill.className = 'pill pill-live'; pill.id = 'backend-pill'; pill.setAttribute('role', 'status');
   pill.title = 'Live webhooks go to ' + CONFIG.url + '. The simulator below still replays fictional scenarios.';
-  pill.textContent = 'Live · checking';
+  // Below 640px only "Live" and the coloured dot show (the .long rule in app.css); the full state stays in aria-label.
+  const show = label => { pill.textContent = 'Live'; const long = doc.createElement('span'); long.className = 'long'; long.textContent = ' · ' + label; pill.append(long); pill.setAttribute('aria-label', 'Live backend: ' + label); };
+  show('checking');
   if (demo) demo.after(pill);
-  probe(CONFIG.url, fetchImpl).then(r => { pill.textContent = 'Live · ' + r.label; pill.dataset.ok = String(!!r.ok); });
+  probe(CONFIG.url, fetchImpl).then(r => { show(r.label); pill.dataset.ok = String(!!r.ok); });
 }
 
 return { CONFIG, probe, mount };
