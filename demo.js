@@ -100,7 +100,9 @@ function makeWorkflow(){
 }
 function execute(code,input,store={}){
   const sandbox={$input:{first:()=>({json:input}),all:()=>Array.isArray(input)?input:[{json:input}]},$getWorkflowStaticData:()=>store};
-  return vm.runInNewContext('(function(){'+code+'\n})()',sandbox,{timeout:1000});
+  // The timeout stops a script that never returns; it is not a speed limit. 1 s was too tight once on a
+  // Windows CI runner (2026-09-24: 'Script execution timed out after 1000ms'; the re-run passed).
+  return vm.runInNewContext('(function(){'+code+'\n})()',sandbox,{timeout:10000});
 }
 function runScenario(s,workflow,print=false){
   let state={};const actions=[];const store={};const engine=workflow.nodes.find(n=>n.name==='State machine').parameters.jsCode;
