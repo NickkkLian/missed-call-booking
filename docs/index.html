@@ -35,9 +35,9 @@
 <footer class="honest">
   <dl class="honest-in">
     <div><dt>About this demo</dt>
-    <dd>Fictional customers (<code>Test Customer 01</code>), phone numbers only from the reserved <code>555-01xx</code> test range, <code>123 Example Road</code>; postal codes <code>K1A 0B1</code> / <code>H0H 0H0</code> are public format examples that may be assigned in the real world. Every send and calendar write is simulated and labelled so. Apart from its web fonts (Google Fonts), the page makes no network requests.</dd></div>
+    <dd>Fictional customers (<code>Test Customer 01</code>), phone numbers only from the reserved <code>555-01xx</code> test range, <code>123 Example Road</code>; postal codes <code>K1A 0B1</code> / <code>H0H 0H0</code> are public format examples that may be assigned in the real world. Every send and calendar write is simulated and labelled so. Apart from its web fonts (Google Fonts), the page makes no network requests, unless a live backend URL is set in <code>backend.js</code> (empty by default).</dd></div>
     <div><dt>Not verified here</dt>
-    <dd>Import into a running n8n instance · provider adapters (SMS, WhatsApp, calendar) are placeholders · static data has no concurrency, crash recovery or durable opt-outs · no geocoding, availability solver, cancellation/rescheduling or emergency triage · provider signature verification is not implemented. The 22 scenarios are replayed in this tab; that proves the state machine, not the runtime.</dd></div>
+    <dd>Import into a running n8n instance · provider adapters (SMS, WhatsApp, calendar) are placeholders · static data has no concurrency, crash recovery or durable opt-outs · no geocoding, availability solver, cancellation/rescheduling or emergency triage · the webhook Worker in <code>worker/</code> (Twilio signature check, forwarding to n8n) is tested locally only and not deployed. The 22 scenarios are replayed in this tab; that proves the state machine, not the runtime.</dd></div>
     <div><dt>Source</dt>
     <dd><a href="https://github.com/NickkkLian/missed-call-booking" rel="noopener">github.com/NickkkLian/missed-call-booking</a> · MIT · built by Nick Lian</dd></div>
   </dl>
@@ -49,5 +49,6 @@
 <script src="data.js"></script>
 <script src="appearance.js"></script>
 <script src="app.js"></script>
+<script src="backend.js"></script>
 </body>
 </html>

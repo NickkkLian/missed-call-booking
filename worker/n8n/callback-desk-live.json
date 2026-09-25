@@ -1,0 +1,345 @@
+{
+  "name": "Callback Desk - live path (Worker intake, staff approval, Google Calendar)",
+  "active": false,
+  "nodes": [
+    {
+      "id": "f0ffa4ed73c148e1fd941739",
+      "name": "Read me",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -260
+      ],
+      "parameters": {
+        "width": 520,
+        "height": 200,
+        "content": "## Callback Desk live path\nWorker intake: the Cloudflare Worker posts verified Twilio events here (Header Auth).\nStaff decision: staff approve a request revision and a time; only then does the calendar node run.\nPending requests: staff list what is waiting.\nNo node sends a message. Drafts wait in static data for staff.\nBind every REPLACE_* credential and the calendar id after import."
+      }
+    },
+    {
+      "id": "204c7fbd79e6e7d187963739",
+      "name": "Worker intake",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "callback-desk-intake",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "callback-desk-intake",
+        "authentication": "headerAuth",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_WORKER_CREDENTIAL_ID",
+          "name": "REPLACE_WORKER_HEADER_AUTH"
+        }
+      }
+    },
+    {
+      "id": "88ecb4b523a2b96cffa749e2",
+      "name": "Create pending request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "function createPending(store, ev, now) {\n  store.items = store.items || {}; store.seen = store.seen || {}; store.seq = store.seq || 0; store.optedOut = store.optedOut || {};\n  if (!ev || typeof ev.id !== 'string' || !['missed_call', 'message'].includes(ev.type) || !/^\\+[1-9]\\d{6,14}$/.test(ev.phone || '')) return { ok: false, reason: 'invalid event' };\n  if (store.seen[ev.id]) return { ok: true, duplicate: true, id: ev.id };\n  store.seen[ev.id] = now;\n  const isStop = ev.type === 'message' && String(ev.text || '').trim().toUpperCase() === 'STOP';\n  let item = Object.values(store.items).find(i => i.phone === ev.phone && i.status === 'pending_staff');\n  if (isStop) {\n    store.optedOut[ev.phone] = now;\n    if (item) { item.status = 'opted_out'; for (const d of item.drafts) if (d.status === 'needs_staff_approval') d.status = 'cancelled'; }\n    return { ok: true, optedOut: ev.phone };\n  }\n  if (store.optedOut[ev.phone]) return { ok: true, suppressed: 'opted out', id: ev.id };\n  if (!item) {\n    const key = 'req-' + (++store.seq);\n    item = store.items[key] = { key, phone: ev.phone, status: 'pending_staff', revision: 1, createdAt: now, events: [], drafts: [] };\n  } else if (ev.type === 'message') item.revision++; // new customer detail: older approvals no longer match\n  item.events.push({ id: ev.id, type: ev.type, at: ev.at, text: ev.type === 'message' ? String(ev.text || '') : undefined });\n  if (ev.type === 'missed_call' && !item.drafts.length) {\n    item.drafts.push({ id: item.key + '-msg-1', status: 'needs_staff_approval', text: 'Sorry we missed your call. Reply here on WhatsApp with your name, address and what needs fixing, and our team will get back to you. Reply STOP to opt out.' });\n  }\n  return { ok: true, pending: item };\n}\nconst store = $getWorkflowStaticData('global');\nconst now = new Date().toISOString();\nreturn $input.all().map(item => ({ json: createPending(store, item.json.body, now) }));"
+      }
+    },
+    {
+      "id": "1a415ae9e7a7964527e4582e",
+      "name": "Staff decision",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        240
+      ],
+      "webhookId": "callback-desk-staff",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "callback-desk-staff",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_STAFF_CREDENTIAL_ID",
+          "name": "REPLACE_STAFF_HEADER_AUTH"
+        }
+      }
+    },
+    {
+      "id": "de221a636127045fc14705bd",
+      "name": "Staff approval guard",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        240
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "function staffGuard(store, d, now) {\n  const item = (store.items || {})[d && d.requestKey];\n  const no = reason => ({ ok: false, reason, requestKey: d && d.requestKey });\n  if (!item) return no('unknown request');\n  if (item.status !== 'pending_staff') return no('request is ' + item.status);\n  if ((store.optedOut || {})[item.phone]) return no('customer opted out');\n  if (d.approved !== true) return no('not approved');\n  if (d.revision !== item.revision) return no('approval is for revision ' + d.revision + ', current is ' + item.revision);\n  const start = Date.parse(d.start), end = Date.parse(d.end);\n  if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return no('start and end must be ISO times with end after start');\n  if (start <= Date.parse(now)) return no('start must be in the future');\n  item.status = 'calendar_pending';\n  item.approval = { revision: item.revision, start: d.start, end: d.end, at: now };\n  return { ok: true, requestKey: item.key, phone: item.phone, start: d.start, end: d.end, summary: String(d.summary || 'Callback Desk booking ' + item.key).slice(0, 120) };\n}\nconst store = $getWorkflowStaticData('global');\nconst now = new Date().toISOString();\nreturn $input.all().map(item => ({ json: staffGuard(store, item.json.body, now) }));"
+      }
+    },
+    {
+      "id": "e939ee7b77e54c2179e3eabd",
+      "name": "Approved?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        520,
+        240
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "ok",
+              "leftValue": "={{ $json.ok }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "a48154b6cd038b85d2b1b3aa",
+      "name": "Create calendar event",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        780,
+        160
+      ],
+      "onError": "continueRegularOutput",
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "mode": "id",
+          "value": "REPLACE_CALENDAR_ID"
+        },
+        "start": "={{ $json.start }}",
+        "end": "={{ $json.end }}",
+        "additionalFields": {
+          "summary": "={{ $json.summary }}",
+          "description": "={{ \"Callback Desk \" + $json.requestKey + \" for \" + $json.phone }}"
+        }
+      },
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "REPLACE_GOOGLE_CALENDAR_CREDENTIAL_ID",
+          "name": "REPLACE_GOOGLE_CALENDAR_OAUTH2"
+        }
+      }
+    },
+    {
+      "id": "0c1eaacc7d0ecee3777f50be",
+      "name": "Record calendar result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        160
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "function recordCalendar(store, requestKey, calendarEvent, now) {\n  const item = (store.items || {})[requestKey];\n  if (!item || item.status !== 'calendar_pending') return { ok: false, reason: 'no calendar-pending request ' + requestKey };\n  if (!calendarEvent || !calendarEvent.id) { item.status = 'calendar_failed'; return { ok: false, reason: 'calendar returned no event id', requestKey }; }\n  item.status = 'booked'; item.calendarEventId = calendarEvent.id; item.bookedAt = now;\n  item.drafts.push({ id: item.key + '-msg-' + (item.drafts.length + 1), status: 'needs_staff_approval', text: 'You are booked for ' + item.approval.start + '. Reply STOP to opt out.' });\n  return { ok: true, requestKey, calendarEventId: calendarEvent.id, status: item.status };\n}\nconst store = $getWorkflowStaticData('global');\nconst now = new Date().toISOString();\nreturn $input.all().map(item => ({ json: recordCalendar(store, $('Staff approval guard').first().json.requestKey, item.json, now) }));"
+      }
+    },
+    {
+      "id": "faee1335a942b5d333672c28",
+      "name": "Reply to staff",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1300,
+        240
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "2c52ab304c69bd54882a4633",
+      "name": "Pending requests",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        480
+      ],
+      "webhookId": "callback-desk-pending",
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "callback-desk-pending",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_STAFF_CREDENTIAL_ID",
+          "name": "REPLACE_STAFF_HEADER_AUTH"
+        }
+      }
+    },
+    {
+      "id": "68489c778dd1010492e14400",
+      "name": "List pending",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        480
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const store = $getWorkflowStaticData('global');\nreturn [{ json: { items: Object.values(store.items || {}).filter(i => ['pending_staff', 'calendar_pending', 'calendar_failed'].includes(i.status) || i.drafts.some(d => d.status === 'needs_staff_approval')) } }];"
+      }
+    },
+    {
+      "id": "939085ce2140ef018a02ae1e",
+      "name": "Reply with pending",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        520,
+        480
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Worker intake": {
+      "main": [
+        [
+          {
+            "node": "Create pending request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Staff decision": {
+      "main": [
+        [
+          {
+            "node": "Staff approval guard",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Staff approval guard": {
+      "main": [
+        [
+          {
+            "node": "Approved?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approved?": {
+      "main": [
+        [
+          {
+            "node": "Create calendar event",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reply to staff",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create calendar event": {
+      "main": [
+        [
+          {
+            "node": "Record calendar result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Record calendar result": {
+      "main": [
+        [
+          {
+            "node": "Reply to staff",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pending requests": {
+      "main": [
+        [
+          {
+            "node": "List pending",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List pending": {
+      "main": [
+        [
+          {
+            "node": "Reply with pending",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "UTC"
+  },
+  "pinData": {},
+  "tags": []
+}

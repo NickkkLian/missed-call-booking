@@ -1,0 +1,16 @@
+# Cloudflare Worker for Callback Desk's live webhooks. See docs/SETUP-BACKEND.md.
+# No secrets here. Set them with:
+#   npx wrangler secret put TWILIO_AUTH_TOKEN
+#   npx wrangler secret put N8N_WEBHOOK_URL
+#   npx wrangler secret put N8N_WEBHOOK_TOKEN
+# Optional secret: FORWARD_TO (a number to ring before a call counts as missed).
+name = "callback-desk-worker"
+main = "src/index.js"
+compatibility_date = "2026-09-01"
+workers_dev = true
+
+[vars]
+# Origin of the demo page allowed to read GET /health. Leave empty to allow none.
+ALLOWED_ORIGIN = "https://nickkklian.github.io"
+# Set only if Twilio calls a custom domain that differs from the URL the Worker sees.
+PUBLIC_BASE_URL = ""

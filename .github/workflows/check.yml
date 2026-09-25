@@ -37,3 +37,12 @@ jobs:
       - run: cmp engine.js docs/engine.js
       - run: node docs/pack-data.mjs && git diff --exit-code -- docs/data.js
       - run: node docs/check-sim.mjs
+  worker:
+    # The webhook Worker, the live n8n export and the page's optional backend hook: local tests with a stub n8n server.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test worker/test/*.test.mjs
