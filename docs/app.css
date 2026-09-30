@@ -338,6 +338,8 @@ html{scroll-padding-bottom:var(--sticky-bottom,0px)}
 .cal td.ev.pending{background:transparent;border:1px dashed var(--border-input)}
 .cal td.ev.failed{background:var(--danger-tint);border-left-color:var(--danger)}
 .cal td.hour{background:transparent;color:var(--text-3);text-align:right;padding-right:4px;font-family:var(--font-mono)}
+.cal .daynav{display:flex;align-items:center;justify-content:space-between;gap:var(--space-2);margin-bottom:var(--space-2);font-size:var(--text-sm)}
+.cal table.day th:first-child{width:40px}
 .cal .legend{display:flex;flex-wrap:wrap;gap:var(--space-3);font-size:var(--text-2xs);color:var(--text-3);margin-top:var(--space-2)}
 .loglist{font:var(--weight-regular) var(--text-xs)/1.6 var(--font-mono);display:grid;gap:2px}
 .loglist div{display:grid;grid-template-columns:5ch 8ch minmax(0,1fr);gap:var(--space-2);padding:2px 0;border-bottom:1px solid var(--hairline)}
@@ -357,9 +359,12 @@ html{scroll-padding-bottom:var(--sticky-bottom,0px)}
 .savebar{position:sticky;bottom:var(--space-4);display:flex;justify-content:flex-end;gap:var(--space-2);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:var(--space-3);box-shadow:var(--shadow-2)}
 @media (max-width:1199px){.console{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.console .col-cal{grid-column:1 / -1}}
 @media (max-width:899px){.console{grid-template-columns:minmax(0,1fr)}.console .col{display:none}.console .col.active{display:block}.phone{max-width:none}}
-.mtabs{display:none;gap:2px;margin-bottom:var(--space-3);background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:2px}   /* sunken like .seg, so it takes the same 1px line */
-.mtabs button{flex:1;height:32px;border:0;border-radius:3px;background:transparent;font-size:var(--text-xs);cursor:pointer;color:var(--text-2)}
-.mtabs button[aria-selected="true"]{background:var(--paper);color:var(--text);box-shadow:var(--shadow-1),inset 0 0 0 1px var(--border-input)}
+.mtabs{display:none;position:relative;gap:2px;margin-bottom:var(--space-3);background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:2px}   /* sunken like .seg, so it takes the same 1px line */
+.mtabs button{position:relative;flex:1;height:32px;border:0;border-radius:3px;background:transparent;font-size:var(--text-xs);cursor:pointer;color:var(--text-2)}
+.mtabs button[aria-selected="true"]{color:var(--text)}
+/* the selected tab's background is one element that slides (v1 §4.19): three equal tabs, 2px gaps, inside 2px padding */
+.mtabs .ind{position:absolute;top:2px;bottom:2px;left:2px;width:calc((100% - 8px) / 3);border-radius:3px;background:var(--paper);box-shadow:var(--shadow-1),inset 0 0 0 1px var(--border-input);transform:translateX(calc(var(--i) * (100% + 2px)))}
+.mtabs button .n{font-family:var(--font-mono);margin-left:4px}
 /* the tabs show only when the columns stack; this rule has to come after the base .mtabs rule, or the tabs stay hidden and the
    staff desk and calendar columns cannot be reached on a phone (the case from the first commit until 2026-09-16) */
 @media (max-width:899px){.mtabs{display:flex}}

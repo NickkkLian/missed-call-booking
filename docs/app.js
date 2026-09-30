@@ -86,7 +86,7 @@ function viewConsole(main) {
   const cur = current(), sim = cur.sim, c = contact(sim), now = cur.now, cfg = cur.config, play = S.mode === 'play';
   let stepperBar = null;
   main.append(h('h1', { class: 'sr-only' }, 'Console'));
-  main.append(h('div', { class: 'mtabs', role: 'tablist' }, [['customer', 'Customer'], ['staff', 'Staff desk'], ['calendar', 'Calendar & state']].map(([k, l]) => h('button', { role: 'tab', 'aria-selected': S.ui.mtab === k ? 'true' : 'false', onclick: () => { S.ui.mtab = k; render(); } }, l))));
+  const mtabs = h('div', { class: 'mtabs', role: 'tablist' }); main.append(mtabs);   // filled below, once the counts are known
   const grid = h('div', { class: 'console' });
   // ── customer column
   const msgs = c ? c.messages : [];
@@ -121,6 +121,17 @@ function viewConsole(main) {
   const staff = h('section', { class: 'col col-staff' + (S.ui.mtab === 'staff' ? ' active' : '') }, h('h2', {}, 'Staff desk', h('span', { class: 'you' }, play ? 'you are: staff' : 'replay')));
   if (!S.ui.seenStart && S.step === 0 && !play) staff.append(h('div', { class: 'guide' }, h('b', {}, 'Start here. '), 'A customer just missed a call. Press ', h('kbd', {}, 'Next'), ' in the phone panel to let the system draft an SMS — nothing is sent until staff approve it. Switch to ', h('i', {}, 'Play'), ' to act as customer and staff yourself. ', h('button', { class: 'btn btn-sm btn-ghost', onclick: () => { S.ui.seenStart = true; try { localStorage.setItem('desk-seen-start', '1'); } catch (e) {} render(); } }, 'Got it')));
   const drafts = msgs.filter(m => m.status === 'needs_staff_approval'), sent = msgs.filter(m => m.status !== 'needs_staff_approval');
+  // phone tabs: Customer (messages in the phone, both channels) · Staff (what waits on staff: drafts + a booking to approve or
+  // fix) · Calendar. The selected tab's background is one indicator that slides between tabs (transform, --dur-base,
+  // --ease-in-out); the tabs are rebuilt on every render, so the slide starts from the tab selected before this render.
+  const waiting = drafts.length + (c && ['awaiting_staff', 'calendar_failed'].includes(c.status) ? 1 : 0);
+  const TABS = [['customer', 'Customer', counts.sms + counts.whatsapp], ['staff', 'Staff', waiting], ['calendar', 'Calendar', null]];
+  const ti = Math.max(0, TABS.findIndex(([k]) => k === S.ui.mtab)), ind = h('span', { class: 'ind', 'aria-hidden': 'true', style: `--i:${ti}` });
+  mtabs.append(ind, ...TABS.map(([k, l, n]) => h('button', { role: 'tab', 'aria-selected': S.ui.mtab === k ? 'true' : 'false', onclick: () => { S.ui.mtab = k; render(); } }, l, n === null ? null : h('span', { class: 'n' }, `(${n})`))));
+  if (S.ui.mtabPrev !== undefined && S.ui.mtabPrev !== ti && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const cs = getComputedStyle(document.documentElement), at = i => `translateX(calc(${i} * (100% + 2px)))`;
+    ind.animate([{ transform: at(S.ui.mtabPrev) }, { transform: at(ti) }], { duration: parseFloat(cs.getPropertyValue('--dur-base')) || 200, easing: cs.getPropertyValue('--ease-in-out').trim() || 'ease-in-out' }); }
+  S.ui.mtabPrev = ti;
   staff.append(h('h3', { style: 'font-size:var(--text-sm);margin:8px 0 6px' }, `Message drafts (${drafts.length})`));
   if (!drafts.length) staff.append(h('p', { class: 'muted', style: 'font-size:var(--text-xs);margin-bottom:8px' }, c ? 'no draft waiting' : 'no conversation yet'));
   for (const m of drafts) staff.append(h('div', { class: 'qcard await' }, h('div', { class: 'qh' }, tag('draft', 'Draft · awaiting staff'), h('span', {}, (m.purpose === 'initial' ? 'SMS' : 'WhatsApp') + ' → ' + PHONE), chip('msg', m.id), chip('rev', m.revision), h('span', { class: 'spacer' }), h('span', { class: 'mono' }, fmtTime(m.createdAt))), h('div', { class: 'txt' }, '“' + m.text + '”'),
@@ -158,12 +169,18 @@ function calendar(c, now, cfg, play) {
   const days = [...Array(7)].map((_, i) => weekStart + i * day), hours = []; for (let hh = Math.max(0, cfg.openHour - 1); hh < Math.min(24, cfg.closeHour + 1); hh++) hours.push(hh);
   const names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   const cal = c?.calendar, evStart = cal ? Date.parse(cal.start) : null, evEnd = cal ? Date.parse(cal.end) : null;
-  const tbl = h('table', { role: play ? 'grid' : null, 'aria-label': 'Week view' }, h('thead', {}, h('tr', {}, h('th', { scope: 'col' }, h('span', { class: 'sr-only' }, 'Hour')), days.map((d, i) => h('th', { class: Math.floor(now / day) === Math.floor(d / day) ? 'today' : '' }, `${names[i]} ${fmtDay(d).slice(0, 2)}`)))),
-    h('tbody', {}, hours.map(hh => h('tr', {}, h('td', { class: 'hour' }, String(hh).padStart(2, '0')), days.map((d, i) => { const t = d + hh * 3600000, open = cfg.businessDays.includes(names[i]) && hh >= cfg.openHour && hh < cfg.closeHour, past = t <= now; let cls = open ? 'open' : ''; if (past) cls += ' past'; if (cal && t < evEnd && t + 3600000 > evStart) cls += ' ev ' + (cal.status === 'confirmed' ? '' : cal.status === 'failed' ? 'failed' : 'pending'); const sel = S.ui.calSel && S.ui.calSel.start === new Date(t).toISOString().replace('.000Z', 'Z'); if (sel) cls += ' sel';
+  // on a phone the week's seven columns were 37px wide with nothing readable in them: show one day, with previous / next.
+  // It opens on the day of the booking (or today) until a day is picked. render() runs again when the window is resized.
+  const dayView = matchMedia('(max-width:639px)').matches, clampDay = i => Math.min(6, Math.max(0, i));
+  const di = S.ui.calDay ?? clampDay(Math.floor(((cal ? evStart : now) - weekStart) / day)), cols = dayView ? [di] : [0, 1, 2, 3, 4, 5, 6];
+  const tbl = h('table', { class: dayView ? 'day' : null, role: play ? 'grid' : null, 'aria-label': dayView ? 'Day view' : 'Week view' }, h('thead', {}, h('tr', {}, h('th', { scope: 'col' }, h('span', { class: 'sr-only' }, 'Hour')), cols.map(i => days[i]).map((d, j) => h('th', { class: Math.floor(now / day) === Math.floor(d / day) ? 'today' : '' }, `${names[cols[j]]} ${fmtDay(d).slice(0, 2)}`)))),
+    h('tbody', {}, hours.map(hh => h('tr', {}, h('td', { class: 'hour' }, String(hh).padStart(2, '0')), cols.map(i => [days[i], i]).map(([d, i]) => { const t = d + hh * 3600000, open = cfg.businessDays.includes(names[i]) && hh >= cfg.openHour && hh < cfg.closeHour, past = t <= now; let cls = open ? 'open' : ''; if (past) cls += ' past'; if (cal && t < evEnd && t + 3600000 > evStart) cls += ' ev ' + (cal.status === 'confirmed' ? '' : cal.status === 'failed' ? 'failed' : 'pending'); const sel = S.ui.calSel && S.ui.calSel.start === new Date(t).toISOString().replace('.000Z', 'Z'); if (sel) cls += ' sel';
       const td = h('td', { class: cls.trim(), title: `${names[i]} ${String(hh).padStart(2, '0')}:00${open ? '' : ' · outside business hours'}${past ? ' · past' : ''}${cal && cls.includes('ev') ? ' · ' + cal.key + ' · ' + cal.status + ' (simulated)' : ''}`, role: play && open && !past ? 'gridcell' : null, tabindex: play && open && !past ? '0' : null });
       if (play && open && !past) { const pick = () => { S.ui.calSel = { start: new Date(t).toISOString().replace('.000Z', 'Z'), end: new Date(t + 3600000).toISOString().replace('.000Z', 'Z') }; render(); toast(`Slot picked: ${names[i]} ${String(hh).padStart(2, '0')}:00–${String(hh + 1).padStart(2, '0')}:00`, { ms: 2000 }); }; td.addEventListener('click', pick); td.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } }); }
       return td; })))));
-  return h('div', { class: 'cal' }, h('div', { class: 'ch' }, h('b', {}, `Week of ${fmtDay(weekStart)} · ${tz()}`), h('span', {}, '· writes are simulated'), play ? h('span', { class: 'spacer' }) : null, play ? h('span', { class: 'faint' }, 'click a slot to pick a time') : null), h('div', { style: 'overflow-x:auto' }, tbl), h('div', { class: 'legend' }, h('span', {}, '▢ dashed = pending write'), h('span', {}, '■ = written (simulated)'), h('span', {}, '░ = outside hours / closed day'), h('span', {}, 'red = write failed')));
+  const dayNav = dayView ? h('div', { class: 'daynav', role: 'group', 'aria-label': 'Day' }, h('button', { class: 'btn btn-sm btn-icon', 'data-key': 'day-prev', 'aria-label': 'Previous day', disabled: di <= 0, onclick: () => { S.ui.calDay = clampDay(di - 1); render(); } }, '◀'),
+    h('b', {}, `${names[di]} ${fmtDay(days[di])}`), h('button', { class: 'btn btn-sm btn-icon', 'data-key': 'day-next', 'aria-label': 'Next day', disabled: di >= 6, onclick: () => { S.ui.calDay = clampDay(di + 1); render(); } }, '▶')) : null;
+  return h('div', { class: 'cal' }, h('div', { class: 'ch' }, h('b', {}, `Week of ${fmtDay(weekStart)} · ${tz()}`), h('span', {}, '· writes are simulated'), play ? h('span', { class: 'spacer' }) : null, play ? h('span', { class: 'faint' }, 'click a slot to pick a time') : null), dayNav, h('div', { style: 'overflow-x:auto' }, tbl), h('div', { class: 'legend' }, h('span', {}, '▢ dashed = pending write'), h('span', {}, '■ = written (simulated)'), h('span', {}, '░ = outside hours / closed day'), h('span', {}, 'red = write failed')));
 }
 
 /* ---------- scenarios / config / log ---------- */
