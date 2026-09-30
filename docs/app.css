@@ -73,11 +73,6 @@ kbd{display:inline-block;min-width:18px;padding:0 var(--space-1);border:1px soli
 .shell.nav-collapsed{grid-template-columns:var(--nav-w-min) minmax(0,1fr) var(--inspector-w)}
 .shell.no-inspector{grid-template-columns:var(--nav-w) minmax(0,1fr) 0}
 .shell.nav-collapsed.no-inspector{grid-template-columns:var(--nav-w-min) minmax(0,1fr) 0}
-.nav{border-right:1px solid var(--nav-line);background:var(--nav-surface);padding:var(--space-5) var(--space-2);position:sticky;top:var(--topbar-h);align-self:start;max-height:calc(100vh - var(--topbar-h));overflow:auto;color:var(--on-nav);min-height:calc(100vh - var(--topbar-h))}
-.nav a{display:flex;align-items:center;gap:var(--space-2);height:var(--control-h);padding:0 var(--space-3);border-radius:var(--radius-sm);color:var(--on-nav);text-decoration:none;font-size:var(--text-sm);transition:background-color var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out)}
-@media (hover:hover) and (pointer:fine){.nav a:hover{background:var(--surface-hover)}}
-.nav a[aria-current="page"]{background:var(--nav-selected);font-weight:var(--weight-medium);box-shadow:inset 3px 0 0 var(--accent-text)}
-.nav a .cnt{margin-left:auto;font:var(--weight-regular) var(--text-2xs)/1 var(--font-mono);color:var(--on-nav-2);font-variant-numeric:tabular-nums}
 .nav a .ico{width:16px;flex:none;color:var(--on-nav-2);font-family:var(--font-mono);font-size:var(--text-2xs);text-align:center}
 .nav .collapse{margin-top:var(--space-3);width:100%;justify-content:flex-start;gap:var(--space-2);padding:0 var(--space-2)}
 .nav .ico svg{display:block}
