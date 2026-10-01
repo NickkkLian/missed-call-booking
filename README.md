@@ -1,20 +1,22 @@
 # Callback Desk
 
-![Callback Desk](.github/header.png)
-
 **Turn missed calls into bookings — staff approve every message and every calendar write.**
 
-A missed call creates an SMS draft that points the customer to WhatsApp intake. Structured details become a booking request. Staff approve the current request before a calendar action can run, and only an authenticated success receipt produces a confirmation draft — which staff approve again. Nothing goes out on its own.
+**Try it:** [open the live simulator](https://nickkklian.github.io/missed-call-booking/#/console?scenario=normal_visit&mode=replay&step=3) — it opens three events into a conversation, with a booking request waiting for staff approval — or run `node demo.js check` in a clone (`CHECK PASS 22/22 scenarios`).
 
-> **This is an offline n8n template with fictional customer records, plus a browser simulator that runs the same state machine.** It has not been imported into a running n8n instance. Provider integrations are adapter placeholders. It is not a deployed customer service.
+[![Callback Desk console: the customer's phone, the staff desk with a draft awaiting approval, and the state card with the last guard decision](docs/screenshot-console.png)](https://nickkklian.github.io/missed-call-booking/#/console?scenario=normal_visit&mode=replay&step=3)
+
+An approval-gated booking state machine. A missed call creates an SMS draft that points the customer to WhatsApp intake. Structured details become a booking request. Staff approve the current request before a calendar action can run, and only an authenticated success receipt produces a confirmation draft — which staff approve again. Nothing goes out on its own. It comes as a browser simulator, 22 replayable scenarios with expected outcomes, three attacks the guard has to reject, and an n8n export of the same code.
+
+**What has not been done:** neither n8n export (`workflow.json`, `worker/n8n/callback-desk-live.json`) has been imported into a running n8n instance, the provider integrations are placeholders, and nothing is deployed. The customer records are fictional.
+
+![Callback Desk](.github/header.png)
 
 [![Check](https://img.shields.io/github/actions/workflow/status/NickkkLian/missed-call-booking/check.yml?branch=main&label=check&style=flat-square&labelColor=2f5859)](https://github.com/NickkkLian/missed-call-booking/actions/workflows/check.yml)
 
-![Callback Desk console: the customer's phone, the staff desk with a draft awaiting approval, and the state card with the last guard decision](docs/screenshot-console.png)
-
 ## Try it
 
-**In the browser** — open the [live simulator](https://nickkklian.github.io/missed-call-booking/) (static, no server; the only network requests are its web fonts) or `docs/index.html` from a clone. *Replay* steps through any of the 22 scenarios one event at a time; *Play as customer & staff* lets you call, text, send the intake form, approve drafts, pick a calendar slot, simulate the adapter receipt, advance the clock, and try the three attacks the guard exists for (a forged approval on the customer route, a replayed approval, a STOP with an old timestamp). The scenarios page replays all 22 in your tab and shows whether each matches its expected outcome.
+**In the browser** — open the [live simulator](https://nickkklian.github.io/missed-call-booking/#/console?scenario=normal_visit&mode=replay&step=3) (static, no server; the only network requests are its web fonts) or `docs/index.html` from a clone. *Replay* steps through any of the 22 scenarios one event at a time; *Play as customer & staff* lets you call, text, send the intake form, approve drafts, pick a calendar slot, simulate the adapter receipt, advance the clock, and try the three attacks the guard exists for (a forged approval on the customer route, a replayed approval, a STOP with an old timestamp). The scenarios page replays all 22 in your tab and shows whether each matches its expected outcome.
 
 **From the command line** — tested with Node.js 24 on macOS; CI runs Node 22 on Ubuntu, Windows and macOS. No packages, services, credentials or internet connection are needed.
 
@@ -61,7 +63,7 @@ All outbound messages, including the first SMS and reminders, require a separate
 
 ## Import and configure
 
-1. In an n8n editor, create a workflow and use **Import from File** to select [workflow.json](workflow.json). The export is inactive and uses built-in nodes: Manual Trigger, Webhook, Schedule Trigger, Code, If, HTTP Request and Sticky Note. Import compatibility still needs a real n8n check.
+1. In an n8n editor, create a workflow and use **Import from File** to select [workflow.json](workflow.json). The export is inactive and uses built-in nodes: Manual Trigger, Webhook, Schedule Trigger, Code, If, HTTP Request and Sticky Note.
 2. Keep `dryRun: true`. Run **Manual demo**. This replays a full conversation in one execution, uses isolated state, and emits no outbound HTTP actions. Read **Review queue** for the transcript and simulated actions.
 3. **Business configuration** is the single variable block: business hours/days/timezone, service postal prefixes, duplicate window, reminder/stop intervals, escalation interval, test WhatsApp number and adapter base URL. The local builder takes the same values from `config.json`. Defaults use UTC and an example service-area configuration. Change local config/source and run `build` to regenerate the JSON; do not edit generated Code nodes independently.
 4. For sandbox webhook experiments, create three different Header Auth credentials: customer-provider ingress, staff decisions, and calendar-adapter receipts. Bind them to the matching placeholder credential slots. The fourth credential authenticates outgoing requests to an adapter. Never put secrets into the exported JSON. n8n supports authenticated webhook nodes; see its [Webhook documentation](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.webhook/).
@@ -76,7 +78,7 @@ All outbound messages, including the first SMS and reminders, require a separate
 node --test worker/test/*.test.mjs
 ```
 
-These tests use a stub n8n server on `127.0.0.1`. They cover the signature check (valid, forged, wrong token, tampered body, missing), both event types, n8n failures, the export's placeholders and graph, and the embedded pending → approval → calendar steps. Nothing has been deployed, and the export has not been imported into n8n. [docs/SETUP-BACKEND.md](docs/SETUP-BACKEND.md) lists every account and step, in order. The page stays in demo mode unless `docs/backend.js` is given a Worker URL.
+These tests use a stub n8n server on `127.0.0.1`. They cover the signature check (valid, forged, wrong token, tampered body, missing), both event types, n8n failures, the export's placeholders and graph, and the embedded pending → approval → calendar steps. [docs/SETUP-BACKEND.md](docs/SETUP-BACKEND.md) lists every account and step, in order. The page stays in demo mode unless `docs/backend.js` is given a Worker URL.
 
 ### Accounts needed for a future integration
 
@@ -208,7 +210,7 @@ Each checker process must exit 1. The demonstration command returns 0 only after
 - Static data does not provide atomic concurrency, crash recovery, durable opt-outs or a bounded history. Before real use, replace it with a transactional state/outbox store and recheck consent/revision at dispatch time. Serial tests do not prove that STOP and an in-flight request cannot race. Stopping contact does not automatically delete an already-created calendar event.
 - The internal escalation is visible in Review queue; external staff notifications and the staff interface are integration work. The current export cannot be presented as a turnkey live service.
 - Address syntax and postal prefixes do not prove an address exists. There is no geocoding, availability solver, appointment cancellation/rescheduling or emergency triage. Do not use this for urgent repairs that need a human dispatcher.
-- The browser simulator has not been imported into n8n either; it demonstrates the state machine and the approval gate, not the n8n runtime. Play sessions are not saved. The calendar grid is drawn in the configured timezone's hours but positioned on UTC days.
+- The browser simulator demonstrates the state machine and the approval gate, not the n8n runtime. Play sessions are not saved. The calendar grid is drawn in the configured timezone's hours but positioned on UTC days.
 
 ## Repository layout
 

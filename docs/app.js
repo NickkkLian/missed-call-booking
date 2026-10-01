@@ -316,7 +316,8 @@ function init() {
     root.style.setProperty('--sticky-bottom', (bar ? bar.offsetHeight : 0) + 'px'); };
   sticky(); new ResizeObserver(sticky).observe($('#subbar')); new MutationObserver(sticky).observe($('#main'), { childList: true }); window.addEventListener('resize', sticky);
   let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(render, 150); });
-  if (!location.hash) location.replace('#/console?scenario=normal_visit&mode=replay&step=0');
+  /* A bare link opens mid-conversation (the first scenario, three events in: a booking request is waiting for staff), not on an empty console. */
+  if (!location.hash) location.replace('#/console?scenario=normal_visit&mode=replay&step=3');
   if (new URLSearchParams(location.search).get('example') === '1') { loadExample(); return; }
   render();
 }
